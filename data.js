@@ -18,6 +18,7 @@ const DEFAULT_SITE_DATA = {
     brokerName: "MARCIO ROGÉRIO",
     brokerMark: "MR",
     brokerSubtitle: "Corretor de Imóveis",
+    showHeaderCta: false, // Controla exibição do botão no canto direito
     headerCtaText: "Fale comigo",
     menuLinks: [
       { label: "Início", url: "#inicio" },

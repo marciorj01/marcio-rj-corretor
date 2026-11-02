@@ -62,7 +62,15 @@ button { font: inherit; }
 }
 
 .wordmark { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.wordmark-image { max-height: 48px; max-width: 220px; object-fit: contain; display: block; }
+.wordmark-image {
+  max-height: 46px;
+  max-width: 220px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  background: transparent !important;
+}
 .wordmark-mark {
   width: 34px;
   height: 34px;
@@ -76,14 +84,7 @@ button { font: inherit; }
 .wordmark-name { font: 700 11px var(--display); letter-spacing: .13em; }
 .wordmark-name strong { display: block; font-size: 10px; font-weight: 500; letter-spacing: .24em; }
 
-.wordmark-image {
-  max-height: 42px;
-  max-width: 190px;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-}
+.mobile-nav-cta { display: none !important; }
 
 .primary-navigation { display: flex; align-items: center; gap: clamp(24px, 4vw, 56px); }
 .primary-navigation a {

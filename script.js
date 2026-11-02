@@ -169,12 +169,17 @@ function renderSiteFromData() {
     });
   }
 
-  // 4.3 Botão CTA do Cabeçalho
+  // 4.3 Botão CTA do Cabeçalho (Opcional - canto direito)
   const headerCta = document.querySelector(".header-cta") || document.getElementById("header-cta-btn");
   if (headerCta) {
-    const ctaText = data.settings?.headerCtaText || "Fale comigo";
-    headerCta.innerHTML = `${ctaText} <span aria-hidden="true">↗</span>`;
-    headerCta.href = `https://wa.me/${phoneRaw}`;
+    const showCta = Boolean(data.settings?.showHeaderCta);
+    if (!showCta || !data.settings?.headerCtaText) {
+      headerCta.style.display = "none";
+    } else {
+      headerCta.style.display = "inline-flex";
+      headerCta.innerHTML = `${data.settings.headerCtaText} <span aria-hidden="true">↗</span>`;
+      headerCta.href = `https://wa.me/${phoneRaw}`;
+    }
   }
 
   const footerPhone = document.querySelector(".phone-link");

@@ -97,9 +97,20 @@
     throw new Error("Não foi possível realizar o upload. Verifique as credenciais do Supabase ou o servidor PHP.");
   }
 
-  // Compressão no navegador
+  // Compressão e preservação de transparência no navegador
   function compressImage(file, maxWidth = 1600, quality = 0.85) {
     return new Promise((resolve, reject) => {
+      const isTransparentFormat = file.type === "image/png" || file.type === "image/svg+xml" || file.type === "image/webp";
+
+      // Para imagens com transparência (como logomarcas PNG ou SVG) até 3MB, mantém o arquivo original intacto
+      if (isTransparentFormat && file.size < 3 * 1024 * 1024) {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+        return;
+      }
+
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (event) => {
@@ -117,7 +128,13 @@
           canvas.height = height;
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL("image/jpeg", quality));
+
+          // NUNCA converte PNG para JPEG para não criar fundo preto
+          if (isTransparentFormat) {
+            resolve(canvas.toDataURL("image/png"));
+          } else {
+            resolve(canvas.toDataURL("image/jpeg", quality));
+          }
         };
         img.onerror = (err) => reject(err);
       };
@@ -321,18 +338,44 @@
 
             <hr style="border:none; border-top:1px solid #334155; margin:24px 0;" />
 
-            <h4 style="margin:0 0 6px; color:#fff; font-size:14px;">Barra de Menu de Navegação</h4>
-            <p style="font-size:13px; color:#94a3b8; margin-top:0;">Adicione, remova ou edite livremente os botões do menu superior.</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:10px;">
+              <div>
+                <h4 style="margin:0 0 4px; color:#fff; font-size:14px;">Barra de Menu de Navegação</h4>
+                <p style="font-size:12px; color:#94a3b8; margin:0;">Adicione, altere ou exclua qualquer link do menu com facilidade.</p>
+              </div>
+              <button type="button" class="mrj-btn-small" id="btn-add-menu-link" style="background:var(--admin-gold); border-color:var(--admin-gold); color:#fff; width:auto; font-weight:700;">➕ Adicionar Link no Menu</button>
+            </div>
 
-            <div id="admin-menu-links-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+            <!-- Sugestões de Atalhos Rápidos -->
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; align-items:center;">
+              <span style="font-size:11px; color:#64748b;">Atalhos rápidos:</span>
+              <button type="button" class="btn-preset-menu mrj-btn-small" data-label="Início" data-url="#inicio" style="padding:3px 8px; font-size:10px;">+ Início</button>
+              <button type="button" class="btn-preset-menu mrj-btn-small" data-label="Empreendimentos" data-url="#empreendimentos" style="padding:3px 8px; font-size:10px;">+ Empreendimentos</button>
+              <button type="button" class="btn-preset-menu mrj-btn-small" data-label="Conteúdos" data-url="#conteudos" style="padding:3px 8px; font-size:10px;">+ Conteúdos</button>
+              <button type="button" class="btn-preset-menu mrj-btn-small" data-label="Contato" data-url="#contato" style="padding:3px 8px; font-size:10px;">+ Contato</button>
+              <button type="button" class="btn-preset-menu mrj-btn-small" data-label="WhatsApp" data-url="https://wa.me/${siteData.settings.phoneRaw}" style="padding:3px 8px; font-size:10px;">+ WhatsApp</button>
+            </div>
+
+            <div id="admin-menu-links-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;">
               <!-- Itens do menu gerados dinamicamente -->
             </div>
 
-            <button type="button" class="mrj-btn-small" id="btn-add-menu-link" style="margin-bottom:20px;">➕ Adicionar Botão no Menu</button>
+            <hr style="border:none; border-top:1px solid #334155; margin:24px 0;" />
 
-            <div class="mrj-input-group" style="margin-top:10px;">
-              <label>Texto do Botão de Destaque no Topo (CTA)</label>
-              <input type="text" id="val-header-cta-text" class="mrj-input" value="${siteData.settings.headerCtaText || 'Fale comigo'}" placeholder="Ex: Fale comigo, Agendar Visita..." />
+            <h4 style="margin:0 0 6px; color:#fff; font-size:14px;">Botão de Destaque no Canto Direito</h4>
+            <p style="font-size:12px; color:#94a3b8; margin-top:0;">Você pode remover esse botão da direita para o menu ficar 100% limpo, ou personalizá-lo.</p>
+
+            <div style="background:#14151a; border:1px solid #282b36; border-radius:6px; padding:14px; margin-bottom:10px;">
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:600; font-size:13px; color:#fff;">
+                <input type="checkbox" id="chk-show-header-cta" ${siteData.settings.showHeaderCta ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+                <span>Exibir botão de destaque no canto direito ("Fale comigo")</span>
+              </label>
+              <div id="box-header-cta-text" style="display:${siteData.settings.showHeaderCta ? 'block' : 'none'}; margin-top:12px;">
+                <div class="mrj-input-group">
+                  <label>Texto do Botão</label>
+                  <input type="text" id="val-header-cta-text" class="mrj-input" value="${siteData.settings.headerCtaText || 'Fale comigo'}" placeholder="Ex: Fale comigo, Agendar Visita..." />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -698,11 +741,25 @@
         ];
       }
 
+      if (siteData.settings.menuLinks.length === 0) {
+        listEl.innerHTML = `
+          <div style="padding:16px; background:#14151a; border:1px dashed #334155; border-radius:6px; text-align:center; color:#94a3b8; font-size:12px;">
+            Nenhum botão no menu no momento. Clique nos botões acima para adicionar!
+          </div>
+        `;
+        return;
+      }
+
       listEl.innerHTML = siteData.settings.menuLinks.map((item, idx) => `
-        <div class="mrj-menu-row" style="display:flex; gap:8px; align-items:center;">
-          <input type="text" class="mrj-input mrj-menu-label" data-idx="${idx}" value="${item.label || ''}" placeholder="Nome (Ex: Início)" style="flex:1;" />
-          <input type="text" class="mrj-input mrj-menu-url" data-idx="${idx}" value="${item.url || ''}" placeholder="Link (#inicio ou URL)" style="flex:1;" />
-          <button type="button" class="mrj-btn-small mrj-menu-del" data-idx="${idx}" style="background:#ef4444; border-color:#ef4444; padding:6px 12px; width:auto;" title="Excluir link">✕</button>
+        <div class="mrj-menu-row" data-idx="${idx}" style="background:#14151a; border:1px solid #282b36; border-radius:6px; padding:10px 12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <span style="font-size:11px; font-weight:700; color:var(--admin-gold); min-width:20px;">#${idx + 1}</span>
+          <div style="flex:1; min-width:140px;">
+            <input type="text" class="mrj-input mrj-menu-label" data-idx="${idx}" value="${item.label || ''}" placeholder="Texto do Menu (Ex: Início)" style="font-size:12px; padding:8px 10px;" />
+          </div>
+          <div style="flex:1.2; min-width:160px;">
+            <input type="text" class="mrj-input mrj-menu-url" data-idx="${idx}" value="${item.url || ''}" placeholder="Link / Destino (#inicio, link)" style="font-size:12px; padding:8px 10px;" />
+          </div>
+          <button type="button" class="mrj-btn-small mrj-menu-del" data-idx="${idx}" style="background:#ef4444; border-color:#ef4444; padding:7px 12px; width:auto; font-size:11px; white-space:nowrap; cursor:pointer;" title="Excluir este botão">🗑️ Excluir</button>
         </div>
       `).join("");
 
@@ -722,7 +779,7 @@
 
       listEl.querySelectorAll(".mrj-menu-del").forEach(btn => {
         btn.addEventListener("click", (e) => {
-          const idx = parseInt(e.target.dataset.idx, 10);
+          const idx = parseInt(btn.dataset.idx, 10);
           siteData.settings.menuLinks.splice(idx, 1);
           renderMenuRows();
         });
@@ -737,6 +794,24 @@
         if (!Array.isArray(siteData.settings.menuLinks)) siteData.settings.menuLinks = [];
         siteData.settings.menuLinks.push({ label: "Novo Link", url: "#" });
         renderMenuRows();
+      });
+    }
+
+    overlay.querySelectorAll(".btn-preset-menu").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const lbl = btn.dataset.label;
+        const url = btn.dataset.url;
+        if (!Array.isArray(siteData.settings.menuLinks)) siteData.settings.menuLinks = [];
+        siteData.settings.menuLinks.push({ label: lbl, url: url });
+        renderMenuRows();
+      });
+    });
+
+    const chkHeaderCta = overlay.querySelector("#chk-show-header-cta");
+    const boxHeaderCtaText = overlay.querySelector("#box-header-cta-text");
+    if (chkHeaderCta && boxHeaderCtaText) {
+      chkHeaderCta.addEventListener("change", (e) => {
+        boxHeaderCtaText.style.display = e.target.checked ? "block" : "none";
       });
     }
 
@@ -954,9 +1029,29 @@
         siteData.settings.brokerName = brokerNameInp.value.trim();
       }
 
+      const chkHeaderCta = overlay.querySelector("#chk-show-header-cta");
+      siteData.settings.showHeaderCta = chkHeaderCta ? chkHeaderCta.checked : false;
+
       const headerCtaInp = overlay.querySelector("#val-header-cta-text");
       if (headerCtaInp) {
         siteData.settings.headerCtaText = headerCtaInp.value.trim();
+      }
+
+      // Salva os links do menu lendo diretamente cada linha do DOM
+      const menuRows = overlay.querySelectorAll(".mrj-menu-row");
+      const updatedMenuLinks = [];
+      menuRows.forEach(row => {
+        const lblInp = row.querySelector(".mrj-menu-label");
+        const urlInp = row.querySelector(".mrj-menu-url");
+        if (lblInp && lblInp.value.trim()) {
+          updatedMenuLinks.push({
+            label: lblInp.value.trim(),
+            url: urlInp ? urlInp.value.trim() : "#"
+          });
+        }
+      });
+      if (updatedMenuLinks.length > 0 || menuRows.length === 0) {
+        siteData.settings.menuLinks = updatedMenuLinks;
       }
 
       // Atualiza Contatos
