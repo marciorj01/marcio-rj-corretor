@@ -13,8 +13,18 @@ const DEFAULT_SITE_DATA = {
     heroOverlayOpacity: 0.45
   },
   settings: {
+    logoType: "text", // "text" | "image"
+    logoImage: "",
     brokerName: "MARCIO ROGÉRIO",
     brokerMark: "MR",
+    brokerSubtitle: "Corretor de Imóveis",
+    headerCtaText: "Fale comigo",
+    menuLinks: [
+      { label: "Início", url: "#inicio" },
+      { label: "Empreendimentos", url: "#empreendimentos" },
+      { label: "Conteúdos", url: "#conteudos" },
+      { label: "Contato", url: "#contato" }
+    ],
     phoneDisplay: "(41) 99108-0293",
     phoneRaw: "5541991080293",
     email: "marciorogerio.corretor@gmail.com",

@@ -199,6 +199,9 @@
       </div>
 
       <div class="mrj-admin-actions">
+        <button type="button" class="mrj-bar-btn" id="mrj-bar-branding">
+          <span>🏷️</span> Logo & Menu
+        </button>
         <button type="button" class="mrj-bar-btn" id="mrj-bar-theme">
           <span>🎨</span> Cores & Tema
         </button>
@@ -222,6 +225,7 @@
 
     document.body.prepend(bar);
 
+    bar.querySelector("#mrj-bar-branding").addEventListener("click", () => openGeneralModal("tab-branding"));
     bar.querySelector("#mrj-bar-theme").addEventListener("click", () => openGeneralModal("tab-theme"));
     bar.querySelector("#mrj-bar-hero").addEventListener("click", () => openGeneralModal("tab-hero"));
     bar.querySelector("#mrj-bar-new-proj").addEventListener("click", () => openProjectModal(null));
@@ -249,6 +253,7 @@
         </div>
 
         <div class="mrj-tabs-bar">
+          <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-branding' ? 'active' : ''}" data-target="tab-branding">🏷️ Logomarca & Menu</button>
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-theme' ? 'active' : ''}" data-target="tab-theme">🎨 Cores & Design</button>
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-hero' ? 'active' : ''}" data-target="tab-hero">🎬 Capa Multimídia (Vídeo/Foto)</button>
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-projects' ? 'active' : ''}" data-target="tab-projects">🏢 Imóveis (${siteData.projects.length})</button>
@@ -259,6 +264,78 @@
         </div>
 
         <div class="mrj-modal-body">
+          <!-- ABA 0: LOGOMARCA & MENU DE NAVEGAÇÃO -->
+          <div class="mrj-tab-content ${defaultTab === 'tab-branding' ? 'active' : ''}" id="tab-branding">
+            <h4 style="margin:0 0 6px; color:#fff; font-size:14px;">Personalização da Logomarca</h4>
+            <p style="font-size:13px; color:#94a3b8; margin-top:0;">Escolha se deseja exibir a imagem da sua logomarca ou seu nome/sigla estilizado.</p>
+
+            <div class="mrj-form-grid" style="margin-bottom:20px;">
+              <div class="mrj-form-full">
+                <label style="display:block; margin-bottom:10px; font-weight:600; font-size:12px; color:#e2e8f0;">Formato do Logotipo:</label>
+                <div style="display:flex; gap:24px;">
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="radio" name="logo-type-radio" value="text" ${siteData.settings.logoType !== 'image' ? 'checked' : ''} />
+                    <span>Texto / Nome do Corretor</span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="radio" name="logo-type-radio" value="image" ${siteData.settings.logoType === 'image' ? 'checked' : ''} />
+                    <span>Imagem da Minha Logomarca</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Opção Imagem -->
+              <div class="mrj-form-full" id="box-logo-image" style="display:${siteData.settings.logoType === 'image' ? 'block' : 'none'};">
+                <div class="mrj-input-group">
+                  <label>Enviar Imagem da Logo (PNG, SVG, WebP ou JPG)</label>
+                  <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="file" id="file-logo-upload" accept="image/*" style="display:none;" />
+                    <button type="button" class="mrj-btn mrj-btn-gold" id="btn-trigger-logo-upload" style="width:auto;">📁 Escolher Imagem</button>
+                    <input type="text" id="val-logo-image-url" class="mrj-input" placeholder="Ou cole a URL da imagem..." value="${siteData.settings.logoImage || ''}" style="flex:1;" />
+                  </div>
+                  <div id="logo-preview-box" style="margin-top:12px; padding:12px; background:#0f1115; border-radius:6px; display:${siteData.settings.logoImage ? 'block' : 'none'}; text-align:center;">
+                    <span style="font-size:11px; color:#94a3b8; display:block; margin-bottom:6px;">Pré-visualização:</span>
+                    <img id="logo-preview-img" src="${siteData.settings.logoImage || ''}" style="max-height:50px; max-width:240px; object-fit:contain;" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Opção Texto -->
+              <div class="mrj-form-full" id="box-logo-text" style="display:${siteData.settings.logoType !== 'image' ? 'block' : 'none'};">
+                <div class="mrj-form-grid">
+                  <div>
+                    <div class="mrj-input-group">
+                      <label>Sigla do Selo (Ex: MR, JS)</label>
+                      <input type="text" id="val-broker-mark" class="mrj-input" value="${siteData.settings.brokerMark || 'MR'}" maxlength="4" />
+                    </div>
+                  </div>
+                  <div>
+                    <div class="mrj-input-group">
+                      <label>Nome do Corretor / Imobiliária</label>
+                      <input type="text" id="val-broker-name" class="mrj-input" value="${siteData.settings.brokerName || 'MARCIO ROGÉRIO'}" placeholder="MARCIO ROGÉRIO" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr style="border:none; border-top:1px solid #334155; margin:24px 0;" />
+
+            <h4 style="margin:0 0 6px; color:#fff; font-size:14px;">Barra de Menu de Navegação</h4>
+            <p style="font-size:13px; color:#94a3b8; margin-top:0;">Adicione, remova ou edite livremente os botões do menu superior.</p>
+
+            <div id="admin-menu-links-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+              <!-- Itens do menu gerados dinamicamente -->
+            </div>
+
+            <button type="button" class="mrj-btn-small" id="btn-add-menu-link" style="margin-bottom:20px;">➕ Adicionar Botão no Menu</button>
+
+            <div class="mrj-input-group" style="margin-top:10px;">
+              <label>Texto do Botão de Destaque no Topo (CTA)</label>
+              <input type="text" id="val-header-cta-text" class="mrj-input" value="${siteData.settings.headerCtaText || 'Fale comigo'}" placeholder="Ex: Fale comigo, Agendar Visita..." />
+            </div>
+          </div>
+
           <!-- ABA 1: CORES & DESIGN (ESTILO WIX) -->
           <div class="mrj-tab-content ${defaultTab === 'tab-theme' ? 'active' : ''}" id="tab-theme">
             <p style="font-size:13px; color:#94a3b8; margin-top:0;">Altere as cores principais com pré-visualização instantânea no site.</p>
@@ -558,6 +635,112 @@
     });
 
     // ========================================================================
+    // EVENTOS DE LOGOMARCA & MENU DE NAVEGAÇÃO
+    // ========================================================================
+    const radioLogoTypes = overlay.querySelectorAll("input[name='logo-type-radio']");
+    const boxLogoImg = overlay.querySelector("#box-logo-image");
+    const boxLogoTxt = overlay.querySelector("#box-logo-text");
+    const fileLogoUpload = overlay.querySelector("#file-logo-upload");
+    const btnTriggerLogo = overlay.querySelector("#btn-trigger-logo-upload");
+    const valLogoUrl = overlay.querySelector("#val-logo-image-url");
+    const logoPrevBox = overlay.querySelector("#logo-preview-box");
+    const logoPrevImg = overlay.querySelector("#logo-preview-img");
+
+    radioLogoTypes.forEach(r => {
+      r.addEventListener("change", (e) => {
+        const isImg = e.target.value === "image";
+        if (boxLogoImg) boxLogoImg.style.display = isImg ? "block" : "none";
+        if (boxLogoTxt) boxLogoTxt.style.display = isImg ? "none" : "block";
+      });
+    });
+
+    if (btnTriggerLogo && fileLogoUpload) {
+      btnTriggerLogo.addEventListener("click", () => fileLogoUpload.click());
+      fileLogoUpload.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          showToast("Enviando imagem da logomarca...");
+          try {
+            const url = await uploadMediaFile(file);
+            valLogoUrl.value = url;
+            if (logoPrevImg) logoPrevImg.src = url;
+            if (logoPrevBox) logoPrevBox.style.display = "block";
+            showToast("Logomarca carregada com sucesso!");
+          } catch (err) {
+            alert("Erro ao enviar imagem: " + err.message);
+          }
+        }
+      });
+    }
+
+    if (valLogoUrl) {
+      valLogoUrl.addEventListener("input", (e) => {
+        const url = e.target.value.trim();
+        if (url) {
+          if (logoPrevImg) logoPrevImg.src = url;
+          if (logoPrevBox) logoPrevBox.style.display = "block";
+        } else {
+          if (logoPrevBox) logoPrevBox.style.display = "none";
+        }
+      });
+    }
+
+    // Gerenciador da Lista de Links do Menu
+    function renderMenuRows() {
+      const listEl = overlay.querySelector("#admin-menu-links-list");
+      if (!listEl) return;
+      if (!Array.isArray(siteData.settings.menuLinks)) {
+        siteData.settings.menuLinks = [
+          { label: "Início", url: "#inicio" },
+          { label: "Empreendimentos", url: "#empreendimentos" },
+          { label: "Conteúdos", url: "#conteudos" },
+          { label: "Contato", url: "#contato" }
+        ];
+      }
+
+      listEl.innerHTML = siteData.settings.menuLinks.map((item, idx) => `
+        <div class="mrj-menu-row" style="display:flex; gap:8px; align-items:center;">
+          <input type="text" class="mrj-input mrj-menu-label" data-idx="${idx}" value="${item.label || ''}" placeholder="Nome (Ex: Início)" style="flex:1;" />
+          <input type="text" class="mrj-input mrj-menu-url" data-idx="${idx}" value="${item.url || ''}" placeholder="Link (#inicio ou URL)" style="flex:1;" />
+          <button type="button" class="mrj-btn-small mrj-menu-del" data-idx="${idx}" style="background:#ef4444; border-color:#ef4444; padding:6px 12px; width:auto;" title="Excluir link">✕</button>
+        </div>
+      `).join("");
+
+      listEl.querySelectorAll(".mrj-menu-label").forEach(inp => {
+        inp.addEventListener("input", (e) => {
+          const idx = parseInt(e.target.dataset.idx, 10);
+          if (siteData.settings.menuLinks[idx]) siteData.settings.menuLinks[idx].label = e.target.value;
+        });
+      });
+
+      listEl.querySelectorAll(".mrj-menu-url").forEach(inp => {
+        inp.addEventListener("input", (e) => {
+          const idx = parseInt(e.target.dataset.idx, 10);
+          if (siteData.settings.menuLinks[idx]) siteData.settings.menuLinks[idx].url = e.target.value;
+        });
+      });
+
+      listEl.querySelectorAll(".mrj-menu-del").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const idx = parseInt(e.target.dataset.idx, 10);
+          siteData.settings.menuLinks.splice(idx, 1);
+          renderMenuRows();
+        });
+      });
+    }
+
+    renderMenuRows();
+
+    const btnAddMenuLink = overlay.querySelector("#btn-add-menu-link");
+    if (btnAddMenuLink) {
+      btnAddMenuLink.addEventListener("click", () => {
+        if (!Array.isArray(siteData.settings.menuLinks)) siteData.settings.menuLinks = [];
+        siteData.settings.menuLinks.push({ label: "Novo Link", url: "#" });
+        renderMenuRows();
+      });
+    }
+
+    // ========================================================================
     // EVENTOS DO SISTEMA DE CORES (LIVE PREVIEW WIX)
     // ========================================================================
     function bindColorSync(pickerId, hexId, key) {
@@ -756,9 +939,31 @@
       siteData.hero.videoPoster = overlay.querySelector("#val-hero-video-poster") ? overlay.querySelector("#val-hero-video-poster").value.trim() : "";
       siteData.hero.videoEmbed = overlay.querySelector("#val-hero-video-embed") ? overlay.querySelector("#val-hero-video-embed").value.trim() : "";
 
+      // Atualiza Logomarca e Identidade
+      const selLogoRadio = overlay.querySelector("input[name='logo-type-radio']:checked");
+      siteData.settings.logoType = selLogoRadio ? selLogoRadio.value : "text";
+      siteData.settings.logoImage = overlay.querySelector("#val-logo-image-url") ? overlay.querySelector("#val-logo-image-url").value.trim() : "";
+      
+      const brokerMarkInp = overlay.querySelector("#val-broker-mark");
+      if (brokerMarkInp && brokerMarkInp.value.trim()) {
+        siteData.settings.brokerMark = brokerMarkInp.value.trim();
+      }
+
+      const brokerNameInp = overlay.querySelector("#val-broker-name");
+      if (brokerNameInp && brokerNameInp.value.trim()) {
+        siteData.settings.brokerName = brokerNameInp.value.trim();
+      }
+
+      const headerCtaInp = overlay.querySelector("#val-header-cta-text");
+      if (headerCtaInp) {
+        siteData.settings.headerCtaText = headerCtaInp.value.trim();
+      }
+
       // Atualiza Contatos
-      siteData.settings.brokerName = overlay.querySelector("#val-conf-name").value.trim();
-      siteData.settings.brokerMark = overlay.querySelector("#val-conf-mark").value.trim();
+      const confNameInp = overlay.querySelector("#val-conf-name");
+      if (confNameInp && confNameInp.value.trim()) siteData.settings.brokerName = confNameInp.value.trim();
+      const confMarkInp = overlay.querySelector("#val-conf-mark");
+      if (confMarkInp && confMarkInp.value.trim()) siteData.settings.brokerMark = confMarkInp.value.trim();
       siteData.settings.phoneDisplay = overlay.querySelector("#val-conf-phone-disp").value.trim();
       siteData.settings.phoneRaw = overlay.querySelector("#val-conf-phone-raw").value.trim();
       siteData.settings.email = overlay.querySelector("#val-conf-email").value.trim();
@@ -968,6 +1173,18 @@
 
             <div class="mrj-form-full">
               <div class="mrj-input-group">
+                <label>🕶️ Link ou PDF do Tour Virtual 360° (Interativo)</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="val-proj-tour" class="mrj-input" value="${project.tourUrl || ''}" placeholder="Link do Tour 360° (Matterport/YouTube) ou link do PDF" />
+                  <input type="file" id="proj-tour-file" accept="application/pdf" style="display:none;" />
+                  <button type="button" class="mrj-btn-small" id="btn-upload-proj-tour" style="white-space:nowrap;">📁 Subir PDF do Tour</button>
+                </div>
+                <span style="font-size:11px; color:#94a3b8; display:block; margin-top:4px;">Se preenchido, um selo e botão especial "🕶️ Tour Virtual 360°" serão exibidos no card do imóvel.</span>
+              </div>
+            </div>
+
+            <div class="mrj-form-full">
+              <div class="mrj-input-group">
                 <label>Mensagem Personalizada do WhatsApp</label>
                 <input type="text" id="val-proj-msg" class="mrj-input" value="${project.whatsappMessage || ''}" placeholder="Ex: Olá Marcio, quero saber mais sobre o Casa Piauí" />
               </div>
@@ -1045,6 +1262,26 @@
       }
     });
 
+    // Upload de Tour Virtual PDF
+    const tourFileInput = overlay.querySelector("#proj-tour-file");
+    const tourInput = overlay.querySelector("#val-proj-tour");
+    if (tourFileInput && tourInput) {
+      overlay.querySelector("#btn-upload-proj-tour").addEventListener("click", () => tourFileInput.click());
+      tourFileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          showToast("Enviando PDF do Tour Virtual...");
+          try {
+            const url = await uploadMediaFile(file);
+            tourInput.value = url;
+            showToast("Tour Virtual PDF salvo com sucesso!");
+          } catch (err) {
+            alert("Erro: " + err.message);
+          }
+        }
+      });
+    }
+
     // Salvar
     overlay.querySelector("#btn-save-project").addEventListener("click", () => {
       const name = overlay.querySelector("#val-proj-name").value.trim();
@@ -1066,6 +1303,7 @@
       project.suites = overlay.querySelector("#val-proj-suites").value.trim();
       project.vagas = overlay.querySelector("#val-proj-vagas").value.trim();
       project.pdfUrl = overlay.querySelector("#val-proj-pdf").value.trim();
+      project.tourUrl = overlay.querySelector("#val-proj-tour") ? overlay.querySelector("#val-proj-tour").value.trim() : "";
       project.whatsappMessage = overlay.querySelector("#val-proj-msg").value.trim() || `Olá Marcio, quero saber mais sobre o ${name}`;
       project.description = overlay.querySelector("#val-proj-desc").value.trim();
       project.image = valImg.value;

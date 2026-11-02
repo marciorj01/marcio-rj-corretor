@@ -17,21 +17,18 @@
   <body>
     <header class="site-header">
       <div class="header-inner">
-        <a class="wordmark" href="#inicio" aria-label="Marcio Rogério — página inicial">
-          <span class="wordmark-mark" aria-hidden="true">MR</span>
-          <span class="wordmark-name">MARCIO <strong>ROGÉRIO</strong></span>
+        <a class="wordmark" href="#inicio" id="site-logo-link" aria-label="Página inicial">
+          <img class="wordmark-image" id="site-logo-img" src="" alt="Logomarca" style="display:none;" />
+          <span class="wordmark-mark" id="site-logo-mark" aria-hidden="true">MR</span>
+          <span class="wordmark-name" id="site-logo-text">MARCIO <strong>ROGÉRIO</strong></span>
         </a>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menu">
           <span></span><span></span>
         </button>
         <nav class="primary-navigation" id="primary-navigation" aria-label="Navegação principal">
-          <a href="#inicio">Início</a>
-          <a href="#empreendimentos">Empreendimentos</a>
-          <a href="#empreendimentos" data-filter-nav="lancamento">Lançamentos</a>
-          <a href="#conteudos">Conteúdos</a>
-          <a href="#contato">Contato</a>
+          <!-- Renderizado dinamicamente via script.js -->
         </nav>
-        <a class="button button-small header-cta" href="https://wa.me/5541991080293" target="_blank" rel="noreferrer">Fale comigo <span aria-hidden="true">↗</span></a>
+        <a class="button button-small header-cta" id="header-cta-btn" href="https://wa.me/5541991080293" target="_blank" rel="noreferrer">Fale comigo <span aria-hidden="true">↗</span></a>
       </div>
     </header>
 
@@ -97,9 +94,10 @@
     <footer class="site-footer" id="contato">
       <div class="footer-inner page-width">
         <div class="footer-about">
-          <a class="wordmark footer-wordmark" href="#inicio">
-            <span class="wordmark-mark" aria-hidden="true">MR</span>
-            <span class="wordmark-name">MARCIO <strong>ROGÉRIO</strong></span>
+          <a class="wordmark footer-wordmark" href="#inicio" id="footer-logo-link">
+            <img class="wordmark-image" id="footer-logo-img" src="" alt="Logomarca" style="display:none;" />
+            <span class="wordmark-mark" id="footer-logo-mark" aria-hidden="true">MR</span>
+            <span class="wordmark-name" id="footer-logo-text">MARCIO <strong>ROGÉRIO</strong></span>
           </a>
           <p>Arquitetura, sofisticação e excelência construtiva transformando cenários urbanos e valorizando investimentos há mais de 45 anos.</p>
           <span class="excellence"><span aria-hidden="true">✧</span> Excelência imobiliária</span>

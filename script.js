@@ -94,23 +94,88 @@ function renderSiteFromData() {
     }
   }
 
-  // 4. Renderizar Contatos e Informações da Marca
+  // 4. Renderizar Contatos, Logomarca, Menu e Informações da Marca
   const phoneRaw = data.settings?.phoneRaw || "5541991080293";
   const phoneDisplay = data.settings?.phoneDisplay || "(41) 99108-0293";
   const email = data.settings?.email || "marciorogerio.corretor@gmail.com";
   const brokerName = data.settings?.brokerName || "MARCIO ROGÉRIO";
   const brokerMark = data.settings?.brokerMark || "MR";
+  const logoType = data.settings?.logoType || "text";
+  const logoImage = data.settings?.logoImage || "";
 
-  document.querySelectorAll(".wordmark-mark").forEach(el => el.textContent = brokerMark);
-  document.querySelectorAll(".wordmark-name").forEach(el => {
-    const parts = brokerName.split(" ");
-    const first = parts[0] || "MARCIO";
-    const rest = parts.slice(1).join(" ") || "ROGÉRIO";
-    el.innerHTML = `${first} <strong>${rest}</strong>`;
-  });
+  // 4.1 Renderizar Logotipo (Imagem ou Texto / Tipografia)
+  const siteLogoImg = document.getElementById("site-logo-img");
+  const siteLogoMark = document.getElementById("site-logo-mark");
+  const siteLogoText = document.getElementById("site-logo-text");
+  const footerLogoImg = document.getElementById("footer-logo-img");
+  const footerLogoMark = document.getElementById("footer-logo-mark");
+  const footerLogoText = document.getElementById("footer-logo-text");
 
-  const headerCta = document.querySelector(".header-cta");
-  if (headerCta) headerCta.href = `https://wa.me/${phoneRaw}`;
+  if (logoType === "image" && logoImage) {
+    if (siteLogoImg) { siteLogoImg.src = logoImage; siteLogoImg.style.display = "block"; }
+    if (siteLogoMark) siteLogoMark.style.display = "none";
+    if (siteLogoText) siteLogoText.style.display = "none";
+
+    if (footerLogoImg) { footerLogoImg.src = logoImage; footerLogoImg.style.display = "block"; }
+    if (footerLogoMark) footerLogoMark.style.display = "none";
+    if (footerLogoText) footerLogoText.style.display = "none";
+  } else {
+    if (siteLogoImg) siteLogoImg.style.display = "none";
+    if (siteLogoMark) siteLogoMark.style.display = "";
+    if (siteLogoText) siteLogoText.style.display = "";
+
+    if (footerLogoImg) footerLogoImg.style.display = "none";
+    if (footerLogoMark) footerLogoMark.style.display = "";
+    if (footerLogoText) footerLogoText.style.display = "";
+
+    document.querySelectorAll(".wordmark-mark").forEach(el => el.textContent = brokerMark);
+    document.querySelectorAll(".wordmark-name").forEach(el => {
+      const parts = brokerName.split(" ");
+      const first = parts[0] || "MARCIO";
+      const rest = parts.slice(1).join(" ") || "ROGÉRIO";
+      el.innerHTML = `${first} <strong>${rest}</strong>`;
+    });
+  }
+
+  // 4.2 Renderizar Menu de Navegação Dinâmico
+  const primaryNav = document.getElementById("primary-navigation");
+  const menuLinks = Array.isArray(data.settings?.menuLinks) && data.settings.menuLinks.length > 0
+    ? data.settings.menuLinks
+    : [
+        { label: "Início", url: "#inicio" },
+        { label: "Empreendimentos", url: "#empreendimentos" },
+        { label: "Conteúdos", url: "#conteudos" },
+        { label: "Contato", url: "#contato" }
+      ];
+
+  if (primaryNav) {
+    const navHtml = menuLinks.map(link => `
+      <a href="${link.url}">${link.label}</a>
+    `).join("");
+
+    primaryNav.innerHTML = navHtml + `
+      <a href="https://wa.me/${phoneRaw}" target="_blank" rel="noreferrer" class="mobile-nav-cta">
+        <span>💬 Fale comigo no WhatsApp</span>
+      </a>
+    `;
+
+    // Fechar menu mobile ao clicar em um link
+    primaryNav.querySelectorAll("a").forEach(a => {
+      a.addEventListener("click", () => {
+        primaryNav.classList.remove("is-open");
+        const toggle = document.querySelector(".menu-toggle");
+        if (toggle) toggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
+  // 4.3 Botão CTA do Cabeçalho
+  const headerCta = document.querySelector(".header-cta") || document.getElementById("header-cta-btn");
+  if (headerCta) {
+    const ctaText = data.settings?.headerCtaText || "Fale comigo";
+    headerCta.innerHTML = `${ctaText} <span aria-hidden="true">↗</span>`;
+    headerCta.href = `https://wa.me/${phoneRaw}`;
+  }
 
   const footerPhone = document.querySelector(".phone-link");
   if (footerPhone) {
@@ -146,6 +211,7 @@ function renderSiteFromData() {
           <a class="project-image-link mrj-open-lead-btn" href="#" data-project-id="${project.id}" aria-label="Ver detalhes de ${project.name}">
             <img src="${project.image}" alt="${project.name}" loading="lazy" />
             <span class="${tagClass}">${project.statusLabel || 'Lançamento'}</span>
+            ${project.tourUrl ? `<span class="tour-floating-badge" aria-label="Tour Virtual disponível">🕶️ Tour 360°</span>` : ''}
             ${project.tagNote ? `<span class="image-note">${project.tagNote}</span>` : ''}
           </a>
           <div class="project-info">
@@ -158,7 +224,10 @@ function renderSiteFromData() {
               <div><dt>Vagas</dt><dd>${project.vagas || '-'}</dd></div>
             </dl>
             <div class="project-actions">
-              <a href="#" class="mrj-open-lead-btn" data-project-id="${project.id}">Conheça o projeto <span aria-hidden="true">→</span></a>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <a href="#" class="mrj-open-lead-btn" data-project-id="${project.id}">Conheça o projeto <span aria-hidden="true">→</span></a>
+                ${project.tourUrl ? `<a href="${project.tourUrl}" target="_blank" rel="noreferrer" class="tour-btn" title="Acessar Tour Virtual 360°">🕶️ Tour Virtual</a>` : ''}
+              </div>
               <button class="favorite-button" type="button" aria-label="Favoritar ${project.name}" aria-pressed="false" data-favorite="${project.id}" data-name="${project.name}">♡</button>
             </div>
           </div>
@@ -342,11 +411,18 @@ function openLeadModal(projectId) {
       <div class="mrj-lead-success">
         <div style="font-size:36px; margin-bottom:8px; color:#10b981;">✓</div>
         <h4>Solicitação Recebida com Sucesso!</h4>
-        <p style="margin-bottom:20px;">Obrigado, <strong>${name}</strong>. ${project.pdfUrl ? "O material foi aberto em nova aba." : "Nossa equipe já preparou a apresentação completa para você."}</p>
+        <p style="margin-bottom:18px;">Obrigado, <strong>${name}</strong>. ${project.pdfUrl ? "O PDF foi aberto em nova aba." : "Nossa equipe já preparou a apresentação completa para você."}</p>
         
-        <a href="${zapDirect}" target="_blank" rel="noreferrer" class="button button-gold" style="width:100%; box-sizing:border-box;">
-          Conversar Agora no WhatsApp ↗
-        </a>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          ${project.tourUrl ? `
+            <a href="${project.tourUrl}" target="_blank" rel="noreferrer" class="button button-pale" style="width:100%; box-sizing:border-box; gap:8px;">
+              🕶️ Acessar Tour Virtual 360° ↗
+            </a>
+          ` : ''}
+          <a href="${zapDirect}" target="_blank" rel="noreferrer" class="button button-gold" style="width:100%; box-sizing:border-box;">
+            Conversar no WhatsApp ↗
+          </a>
+        </div>
       </div>
     `;
   });

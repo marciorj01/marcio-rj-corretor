@@ -627,3 +627,56 @@ textarea.mrj-input {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* ==============================================================================
+   RESPONSIVIDADE DO PAINEL ADMINISTRATIVO
+   ============================================================================== */
+@media (max-width: 768px) {
+  .mrj-admin-bar {
+    padding: 0 10px;
+    height: 48px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mrj-admin-active {
+    margin-top: 48px !important;
+  }
+  .mrj-admin-brand span:not(.mrj-badge-builder) {
+    display: none;
+  }
+  .mrj-bar-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .mrj-modal {
+    width: 96vw;
+    max-height: 92vh;
+    border-radius: 8px;
+  }
+  .mrj-modal-header {
+    padding: 14px 18px;
+  }
+  .mrj-modal-body {
+    padding: 16px;
+  }
+  .mrj-tabs-bar {
+    padding: 8px 12px;
+  }
+  .mrj-tab-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  .mrj-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+  .mrj-modal-footer {
+    padding: 12px 16px;
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+  .mrj-modal-footer > div {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
