@@ -9,3 +9,8 @@ Thumbs.db
 # Logs temporários
 *.log
 
+# Arquivos de senhas e anotações pessoais
+*senha*
+*token*
+*.txt
+

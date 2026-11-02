@@ -9,8 +9,8 @@ const DEFAULT_SITE_DATA = {
     email: "marciorogerio.corretor@gmail.com",
     experienceYears: "+45",
     adminPasswordHash: "mrj@2025", // Senha inicial padrão
-    supabaseUrl: "",
-    supabaseKey: "",
+    supabaseUrl: "https://wcopjkuhncdzxsriwzgy.supabase.co",
+    supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indjb3Bqa3VobmNkenhzcml3emd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MzUyNjksImV4cCI6MjEwOTIxMTI2OX0.zpKHHp2StajYdQR0iksN3sX5WnYyHmCb7r6Y3jScGaU",
     supabaseBucket: "imoveis"
   },
   hero: {

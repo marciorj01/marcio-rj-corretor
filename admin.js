@@ -360,8 +360,12 @@
 
             <div class="mrj-form-full">
               <div class="mrj-input-group">
-                <label>📄 Link do PDF / Book de Apresentação (Download do Lead)</label>
-                <input type="url" id="mrj-proj-pdf" class="mrj-input" value="${project.pdfUrl || ''}" placeholder="Ex: https://meusite.com/books/casa-piaui.pdf ou link do Google Drive/Supabase" />
+                <label>📄 Arquivo PDF / Book de Apresentação (Download do Lead)</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="url" id="mrj-proj-pdf" class="mrj-input" value="${project.pdfUrl || ''}" placeholder="Link do PDF ou envie o arquivo ao lado →" />
+                  <input type="file" id="mrj-pdf-file-input" accept="application/pdf" style="display:none;" />
+                  <button type="button" class="mrj-btn-small" id="mrj-btn-upload-pdf" style="white-space:nowrap; background:#2a2d38;">📁 Subir PDF</button>
+                </div>
                 <small style="color:#94a3b8; font-size:11px;">Quando o visitante clica em 'Conheça o projeto', ele preenche o formulário de lead e baixa este PDF.</small>
               </div>
             </div>
@@ -425,6 +429,47 @@
         imgVal.value = url;
       }
     });
+
+    // Upload de PDF para o Supabase Storage
+    const pdfFileInput = overlay.querySelector("#mrj-pdf-file-input");
+    const uploadPdfBtn = overlay.querySelector("#mrj-btn-upload-pdf");
+    const pdfInput = overlay.querySelector("#mrj-proj-pdf");
+
+    if (uploadPdfBtn && pdfFileInput) {
+      uploadPdfBtn.addEventListener("click", () => pdfFileInput.click());
+      pdfFileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          if (siteData.settings.supabaseUrl && siteData.settings.supabaseKey) {
+            showToast("Enviando PDF para o Supabase Storage...");
+            const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+            const endpoint = `${siteData.settings.supabaseUrl.replace(/\/$/, '')}/storage/v1/object/documentos/${safeName}`;
+            try {
+              const res = await fetch(endpoint, {
+                method: "POST",
+                headers: {
+                  "apikey": siteData.settings.supabaseKey,
+                  "Authorization": `Bearer ${siteData.settings.supabaseKey}`,
+                  "Content-Type": file.type || "application/pdf"
+                },
+                body: file
+              });
+              if (res.ok) {
+                const publicUrl = `${siteData.settings.supabaseUrl.replace(/\/$/, '')}/storage/v1/object/public/documentos/${safeName}`;
+                pdfInput.value = publicUrl;
+                showToast("PDF enviado para o Supabase com sucesso!");
+              } else {
+                showToast("Aviso: certifique-se de que o bucket 'documentos' foi criado no Supabase.", false);
+              }
+            } catch (err) {
+              showToast("Erro ao conectar com o Supabase Storage.", false);
+            }
+          } else {
+            alert("Para enviar o arquivo direto do seu PC, primeiro salve a URL e Key do Supabase na aba 'Supabase & Nuvem'. Ou cole o link do seu PDF (Google Drive/Dropbox).");
+          }
+        }
+      });
+    }
 
     // Salvar Imóvel
     overlay.querySelector("#mrj-save-project").addEventListener("click", () => {
@@ -1029,38 +1074,67 @@
   async function publishAllChanges() {
     saveSiteData(siteData);
 
-    if (siteData.settings.supabaseUrl && siteData.settings.supabaseKey) {
+    const supUrl = siteData.settings?.supabaseUrl;
+    const supKey = siteData.settings?.supabaseKey;
+
+    if (supUrl && supKey) {
       showToast("Sincronizando com o Supabase...");
       try {
-        const url = `${siteData.settings.supabaseUrl.replace(/\/$/, '')}/rest/v1/mrj_site_data`;
-        const res = await fetch(url, {
-          method: "POST",
+        const baseEndpoint = `${supUrl.replace(/\/$/, '')}/rest/v1/mrj_site_data`;
+
+        // 1. Tenta atualizar a linha 1 via PATCH
+        let res = await fetch(`${baseEndpoint}?id=eq.1`, {
+          method: "PATCH",
           headers: {
-            "apikey": siteData.settings.supabaseKey,
-            "Authorization": `Bearer ${siteData.settings.supabaseKey}`,
+            "apikey": supKey,
+            "Authorization": `Bearer ${supKey}`,
             "Content-Type": "application/json",
-            "Prefer": "resolution=merge-duplicates"
+            "Prefer": "return=representation"
           },
           body: JSON.stringify({
-            id: 1,
             data: siteData,
             updated_at: new Date().toISOString()
           })
         });
 
+        let updated = false;
         if (res.ok) {
-          showToast("Publicado no Supabase com sucesso!");
+          const rows = await res.json();
+          if (rows && rows.length > 0) updated = true;
+        }
+
+        // 2. Se a linha 1 não existia ainda, insere via POST
+        if (!updated) {
+          res = await fetch(`${baseEndpoint}?on_conflict=id`, {
+            method: "POST",
+            headers: {
+              "apikey": supKey,
+              "Authorization": `Bearer ${supKey}`,
+              "Content-Type": "application/json",
+              "Prefer": "resolution=merge-duplicates"
+            },
+            body: JSON.stringify({
+              id: 1,
+              data: siteData,
+              updated_at: new Date().toISOString()
+            })
+          });
+          if (res.ok) updated = true;
+        }
+
+        if (updated) {
+          showToast("✓ Publicado no Supabase com sucesso!");
         } else {
           const errText = await res.text();
           console.warn("Supabase response:", errText);
-          showToast("Salvo localmente! (Aviso do Supabase no console)", false);
+          showToast(`Aviso Supabase: verifique se rodou o script SQL (${res.status})`, false);
         }
       } catch (err) {
         console.error("Erro ao sincronizar com Supabase:", err);
-        showToast("Salvo localmente! (Supabase indisponível)", false);
+        showToast("Erro de conexão com o Supabase.", false);
       }
     } else {
-      showToast("Alterações salvas com sucesso!");
+      showToast("Salvo apenas neste navegador! Conecte o Supabase para sincronizar em outros.", false);
     }
   }
 

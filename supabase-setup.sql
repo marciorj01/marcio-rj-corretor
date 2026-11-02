@@ -70,5 +70,24 @@ to anon, authenticated
 using (true);
 
 -- ==============================================================================
--- PRONTO! Suas tabelas e permissões estão 100% configuradas e protegidas.
+-- PARTE 3: STORAGE DOS PDFs (BUCKET DE DOCUMENTOS E BOOKS)
+-- ==============================================================================
+insert into storage.buckets (id, name, public)
+values ('documentos', 'documentos', true)
+on conflict (id) do nothing;
+
+drop policy if exists "Download público de documentos" on storage.objects;
+create policy "Download público de documentos"
+on storage.objects for select
+to anon, authenticated
+using (bucket_id = 'documentos');
+
+drop policy if exists "Upload de documentos" on storage.objects;
+create policy "Upload de documentos"
+on storage.objects for insert
+to anon, authenticated
+with check (bucket_id = 'documentos');
+
+-- ==============================================================================
+-- PRONTO! Suas tabelas e bucket de arquivos estão 100% configurados.
 -- ==============================================================================
