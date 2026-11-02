@@ -1,94 +1,155 @@
-// ==========================================================================
-// RENDERIZAÇÃO PRINCIPAL DO SITE & CONTROLES
-// ==========================================================================
+// ==============================================================================
+// MRJ CMS - FRONTEND PRINCIPAL COM SUPORTE MULTIMÍDIA E TEMAS DINÂMICOS
+// ==============================================================================
 
 let activeFilter = "todos";
 
-// Função para renderizar o site completo com os dados atuais
+/**
+ * Converte URLs do YouTube ou Vimeo em links de embed para reprodução em loop contínuo
+ */
+function getEmbedUrl(rawUrl) {
+  if (!rawUrl) return "";
+  const trimmed = rawUrl.trim();
+
+  // YouTube
+  const ytMatch = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i);
+  if (ytMatch) {
+    const videoId = ytMatch[1];
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1`;
+  }
+
+  // Vimeo
+  const vimeoMatch = trimmed.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/i);
+  if (vimeoMatch) {
+    const vimeoId = vimeoMatch[1];
+    return `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&background=1&autopause=0`;
+  }
+
+  return trimmed;
+}
+
+/**
+ * Renderização Completa do Site a partir dos Dados Dinâmicos
+ */
 function renderSiteFromData() {
   const data = typeof getSiteData === "function" ? getSiteData() : DEFAULT_SITE_DATA;
 
-  // 1. Renderizar Hero
-  const heroSection = document.querySelector(".hero");
-  if (heroSection) {
-    const heroImage = heroSection.querySelector(".hero-image");
-    if (heroImage && data.hero?.image) {
-      heroImage.style.backgroundImage = `url("${data.hero.image}")`;
-    }
+  // 1. Injetar Paleta de Cores e Estilo Visual (Estilo Wix)
+  if (typeof applyThemeColors === "function" && data.theme) {
+    applyThemeColors(data.theme);
+  }
 
-    const heroEyebrow = heroSection.querySelector(".eyebrow-light");
-    if (heroEyebrow && data.hero?.eyebrow) {
-      heroEyebrow.innerHTML = `<span class="eyebrow-line"></span> ${data.hero.eyebrow}`;
-    }
+  // 2. Renderizar Capa Multimídia (Hero Section)
+  const heroMediaContainer = document.getElementById("hero-media-container");
+  if (heroMediaContainer && data.hero) {
+    const mediaType = data.hero.mediaType || "image";
 
-    const heroTitle = heroSection.querySelector("#hero-title");
-    if (heroTitle && data.hero?.title) {
-      heroTitle.innerHTML = data.hero.title;
-    }
-
-    const heroCopy = heroSection.querySelector(".hero-copy");
-    if (heroCopy && data.hero?.copy) {
-      heroCopy.textContent = data.hero.copy;
-    }
-
-    const heroCta = heroSection.querySelector(".hero-content .button-gold");
-    if (heroCta && data.hero?.ctaText) {
-      heroCta.innerHTML = `${data.hero.ctaText} <span aria-hidden="true">→</span>`;
+    if (mediaType === "video_local" && data.hero.videoUrl) {
+      // Vídeo Local MP4/WebM
+      const poster = data.hero.videoPoster || data.hero.imageUrl || "";
+      heroMediaContainer.innerHTML = `
+        <video class="hero-video" autoplay muted loop playsinline poster="${poster}">
+          <source src="${data.hero.videoUrl}" type="video/mp4">
+        </video>
+      `;
+    } else if (mediaType === "video_embed" && data.hero.videoEmbed) {
+      // Vídeo Embed (YouTube ou Vimeo)
+      const embedSrc = getEmbedUrl(data.hero.videoEmbed);
+      heroMediaContainer.innerHTML = `
+        <div class="hero-embed-wrapper">
+          <iframe src="${embedSrc}" allow="autoplay; fullscreen" loading="lazy"></iframe>
+        </div>
+      `;
+    } else {
+      // Imagem Estática (Padrão)
+      const imgUrl = data.hero.imageUrl || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2200&q=90";
+      heroMediaContainer.innerHTML = `
+        <div class="hero-image" style="background-image: url('${imgUrl}');"></div>
+      `;
     }
   }
 
-  // 2. Renderizar Contatos e Links de WhatsApp
+  // 3. Renderizar Textos do Hero
+  if (data.hero) {
+    const heroEyebrow = document.getElementById("hero-eyebrow-text");
+    if (heroEyebrow) heroEyebrow.textContent = data.hero.eyebrow || "SELEÇÃO EXCLUSIVA";
+
+    const heroTitle = document.getElementById("hero-title");
+    if (heroTitle && data.hero.title) heroTitle.innerHTML = data.hero.title;
+
+    const heroCopy = document.getElementById("hero-copy");
+    if (heroCopy && data.hero.copy) heroCopy.textContent = data.hero.copy;
+
+    const heroCtaBtn = document.getElementById("hero-cta-btn");
+    if (heroCtaBtn) {
+      heroCtaBtn.innerHTML = `${data.hero.ctaText || "Encontre seu novo lar"} <span aria-hidden="true">→</span>`;
+      heroCtaBtn.href = data.hero.ctaLink || "#empreendimentos";
+    }
+
+    const heroHighlights = document.getElementById("hero-highlights");
+    if (heroHighlights && Array.isArray(data.hero.highlights)) {
+      heroHighlights.innerHTML = data.hero.highlights.map(h => `
+        <span><strong>${h.num}</strong> ${h.text}</span>
+      `).join("");
+    }
+  }
+
+  // 4. Renderizar Contatos e Informações da Marca
   const phoneRaw = data.settings?.phoneRaw || "5541991080293";
   const phoneDisplay = data.settings?.phoneDisplay || "(41) 99108-0293";
   const email = data.settings?.email || "marciorogerio.corretor@gmail.com";
   const brokerName = data.settings?.brokerName || "MARCIO ROGÉRIO";
   const brokerMark = data.settings?.brokerMark || "MR";
 
-  // Cabeçalho e Marca
   document.querySelectorAll(".wordmark-mark").forEach(el => el.textContent = brokerMark);
   document.querySelectorAll(".wordmark-name").forEach(el => {
-    el.innerHTML = `${brokerName.replace(' ', ' <strong>')}</strong>`;
+    const parts = brokerName.split(" ");
+    const first = parts[0] || "MARCIO";
+    const rest = parts.slice(1).join(" ") || "ROGÉRIO";
+    el.innerHTML = `${first} <strong>${rest}</strong>`;
   });
 
-  // Botão CTA do cabeçalho
   const headerCta = document.querySelector(".header-cta");
-  if (headerCta) {
-    headerCta.href = `https://wa.me/${phoneRaw}`;
-  }
+  if (headerCta) headerCta.href = `https://wa.me/${phoneRaw}`;
 
-  // Rodapé
   const footerPhone = document.querySelector(".phone-link");
   if (footerPhone) {
     footerPhone.href = `tel:+${phoneRaw}`;
     footerPhone.textContent = phoneDisplay;
   }
 
-  const footerEmail = document.querySelector(".footer-contact a[href^='mailto:']");
+  const footerEmail = document.querySelector(".email-link");
   if (footerEmail) {
     footerEmail.href = `mailto:${email}`;
     footerEmail.textContent = email;
   }
 
-  // 3. Renderizar Empreendimentos
-  const projectGrid = document.querySelector(".project-grid");
+  const btnMore = document.getElementById("btn-more-projects");
+  if (btnMore) {
+    btnMore.href = `https://wa.me/${phoneRaw}?text=${encodeURIComponent("Olá Marcio, quero conhecer outros empreendimentos disponíveis.")}`;
+  }
+
+  // 5. Renderizar Empreendimentos (Cards Imobiliários)
+  const projectGrid = document.getElementById("projects-container") || document.querySelector(".project-grid");
   if (projectGrid && Array.isArray(data.projects)) {
     projectGrid.innerHTML = data.projects.map(project => {
       let tagClass = "status-tag";
       if (project.status === "obras") tagClass += " status-tag-dark";
       if (project.status === "pronto") tagClass += " status-tag-light";
 
-      const waMsg = encodeURIComponent(project.whatsappMessage || `Quero saber mais sobre o ${project.name}`);
+      const refText = project.ref ? ` · REF: ${project.ref}` : '';
+      const waMsg = encodeURIComponent(project.whatsappMessage || `Olá Marcio, quero saber mais sobre o ${project.name} (${project.ref || 'Ref: Site'})`);
       const waLink = `https://wa.me/${phoneRaw}?text=${waMsg}`;
 
       return `
         <article class="project-card" data-status="${project.status || 'lancamento'}">
-          <a class="project-image-link" href="${waLink}" target="_blank" rel="noreferrer" aria-label="Saiba mais sobre ${project.name}">
+          <a class="project-image-link mrj-open-lead-btn" href="#" data-project-id="${project.id}" aria-label="Ver detalhes de ${project.name}">
             <img src="${project.image}" alt="${project.name}" loading="lazy" />
             <span class="${tagClass}">${project.statusLabel || 'Lançamento'}</span>
             ${project.tagNote ? `<span class="image-note">${project.tagNote}</span>` : ''}
           </a>
           <div class="project-info">
-            <p class="location"><span aria-hidden="true">⌖</span> ${project.location}</p>
+            <p class="location"><span aria-hidden="true">⌖</span> ${project.location}${refText}</p>
             <h3>${project.name}</h3>
             <p class="project-description">${project.description || ''}</p>
             <dl class="project-stats">
@@ -97,22 +158,21 @@ function renderSiteFromData() {
               <div><dt>Vagas</dt><dd>${project.vagas || '-'}</dd></div>
             </dl>
             <div class="project-actions">
-              <a href="${waLink}" class="mrj-open-lead-btn" data-project-id="${project.id}">Conheça o projeto <span aria-hidden="true">→</span></a>
-              <button class="favorite-button" type="button" aria-label="Adicionar ${project.name} aos favoritos" aria-pressed="false" data-favorite="${project.id}" data-name="${project.name}">♡</button>
+              <a href="#" class="mrj-open-lead-btn" data-project-id="${project.id}">Conheça o projeto <span aria-hidden="true">→</span></a>
+              <button class="favorite-button" type="button" aria-label="Favoritar ${project.name}" aria-pressed="false" data-favorite="${project.id}" data-name="${project.name}">♡</button>
             </div>
           </div>
         </article>
       `;
     }).join("");
 
-    // Reconectar eventos de favoritos e aplicar filtro ativo
     setupFavoriteButtons();
     setupLeadModalTriggers();
     setProjectFilter(activeFilter);
   }
 
-  // 4. Renderizar Artigos
-  const articleGrid = document.querySelector(".article-grid");
+  // 6. Renderizar Artigos / Blog
+  const articleGrid = document.getElementById("articles-container") || document.querySelector(".article-grid");
   if (articleGrid && Array.isArray(data.articles)) {
     articleGrid.innerHTML = data.articles.map(art => `
       <article class="article-card">
@@ -131,9 +191,9 @@ function renderSiteFromData() {
   }
 }
 
-// ==========================================================================
+// ==============================================================================
 // FILTROS & FAVORITOS
-// ==========================================================================
+// ==============================================================================
 
 const filterButtons = document.querySelectorAll(".filter-button");
 
@@ -170,27 +230,20 @@ function setupFavoriteButtons() {
 
     button.setAttribute("aria-pressed", String(isFavorite));
     button.textContent = isFavorite ? "♥" : "♡";
-    if (isFavorite) {
-      button.setAttribute("aria-label", `Remover ${button.dataset.name} dos favoritos`);
-    }
 
     button.onclick = (e) => {
       e.preventDefault();
       const nextValue = button.getAttribute("aria-pressed") !== "true";
       button.setAttribute("aria-pressed", String(nextValue));
       button.textContent = nextValue ? "♥" : "♡";
-      button.setAttribute(
-        "aria-label",
-        `${nextValue ? "Remover" : "Adicionar"} ${button.dataset.name} ${nextValue ? "dos" : "aos"} favoritos`,
-      );
       localStorage.setItem(key, String(nextValue));
     };
   });
 }
 
-// ==========================================================================
+// ==============================================================================
 // MODAL DE CAPTURA DE LEADS (DOWNLOAD DO BOOK / PDF)
-// ==========================================================================
+// ==============================================================================
 
 function setupLeadModalTriggers() {
   document.querySelectorAll(".mrj-open-lead-btn").forEach((link) => {
@@ -248,13 +301,11 @@ function openLeadModal(projectId) {
 
   document.body.appendChild(overlay);
 
-  // Fechar modal
   overlay.querySelector(".mrj-lead-close").addEventListener("click", () => overlay.remove());
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) overlay.remove();
   });
 
-  // Enviar Lead
   const form = overlay.querySelector("#mrj-lead-form");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -279,12 +330,10 @@ function openLeadModal(projectId) {
       await submitLead(lead);
     }
 
-    // Se houver PDF cadastrado, abre em nova aba
     if (project.pdfUrl) {
       window.open(project.pdfUrl, "_blank");
     }
 
-    // Tela de sucesso
     const bodyContent = overlay.querySelector("#mrj-lead-body-content");
     const zapMsg = encodeURIComponent(`Olá Marcio Rogério! Sou ${name}, acabei de solicitar o Book do ${project.name} no site e gostaria de mais detalhes.`);
     const zapDirect = `https://wa.me/${phoneRaw}?text=${zapMsg}`;
@@ -311,49 +360,44 @@ if (menuToggle && navigation) {
   menuToggle.addEventListener("click", () => {
     const isOpen = menuToggle.getAttribute("aria-expanded") !== "true";
     menuToggle.setAttribute("aria-expanded", String(isOpen));
-    menuToggle.setAttribute("aria-label", isOpen ? "Fechar menu" : "Abrir menu");
     navigation.classList.toggle("is-open", isOpen);
   });
 
   navigation.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
       menuToggle.setAttribute("aria-expanded", "false");
-      menuToggle.setAttribute("aria-label", "Abrir menu");
       navigation.classList.remove("is-open");
     });
   });
 }
 
-// ==========================================================================
-// DETECÇÃO DO PAINEL OCULTO (?painel ou ?admin)
-// ==========================================================================
+// ==============================================================================
+// INICIALIZAÇÃO & CARREGAMENTO DINÂMICO DO PAINEL
+// ==============================================================================
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Renderizar o site inicialmente com dados locais
   renderSiteFromData();
 
-  // Sincronizar com Supabase em segundo plano se configurado
+  // Sincronizar com Supabase em segundo plano
   const currentData = typeof getSiteData === "function" ? getSiteData() : null;
   if (currentData && currentData.settings?.supabaseUrl && currentData.settings?.supabaseKey && typeof fetchSupabaseData === "function") {
     const remote = await fetchSupabaseData(currentData.settings.supabaseUrl, currentData.settings.supabaseKey);
-    if (remote && remote.projects) {
+    if (remote && (remote.projects || remote.hero || remote.theme)) {
       saveSiteData(remote);
       renderSiteFromData();
     }
   }
 
-  // Se a URL contiver '?painel' ou '?admin', carregar dinamicamente o painel administrativo
+  // Detecção de acesso ao painel via ?painel ou ?admin
   const searchParams = new URLSearchParams(window.location.search);
   const isPainelRequested = searchParams.has("painel") || searchParams.has("admin");
 
   if (isPainelRequested) {
-    // Carregar CSS do Admin
     const adminCss = document.createElement("link");
     adminCss.rel = "stylesheet";
     adminCss.href = "admin.css";
     document.head.appendChild(adminCss);
 
-    // Carregar JS do Admin
     const adminScript = document.createElement("script");
     adminScript.src = "admin.js";
     document.body.appendChild(adminScript);

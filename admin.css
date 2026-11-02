@@ -1,157 +1,53 @@
-/* ==========================================================================
-   MRJ BUILDER - PAINEL ADMINISTRATIVO ESTILO ELEMENTOR
-   ========================================================================== */
+/* ==============================================================================
+   MRJ CMS BUILDER - PAINEL ADMINISTRATIVO MODULAR ESTILO WIX
+   ============================================================================== */
 
-/* Bloqueio de Login */
-.mrj-login-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  background: rgba(15, 17, 21, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  animation: mrjFadeIn 0.3s ease;
+:root {
+  --admin-bg: #0f1013;
+  --admin-panel: #18191f;
+  --admin-card: #20222a;
+  --admin-gold: #b49a70;
+  --admin-gold-hover: #9c8058;
+  --admin-text: #ffffff;
+  --admin-muted: #94a3b8;
+  --admin-border: rgba(255, 255, 255, 0.08);
+  --admin-border-gold: rgba(180, 154, 112, 0.35);
+  --admin-success: #10b981;
+  --admin-danger: #ef4444;
+}
+
+body.mrj-admin-standalone {
+  background: var(--admin-bg);
+  color: var(--admin-text);
   font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 }
 
-.mrj-login-card {
-  width: 100%;
-  max-width: 420px;
-  background: #1c1d22;
-  border: 1px solid rgba(180, 154, 112, 0.35);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(180, 154, 112, 0.15);
-  border-radius: 12px;
-  padding: 36px 32px;
-  color: #fff;
-  text-align: center;
-}
-
-.mrj-login-logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.mrj-login-mark {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #b49a70;
-  color: #d6b885;
-  font: 700 14px Georgia, serif;
-}
-
-.mrj-login-card h2 {
-  font-family: 'Manrope', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0 0 8px;
-  letter-spacing: -0.02em;
-}
-
-.mrj-login-card p {
-  color: #9c9da3;
-  font-size: 13px;
-  margin: 0 0 24px;
-  line-height: 1.5;
-}
-
-.mrj-input-group {
-  margin-bottom: 18px;
-  text-align: left;
-}
-
-.mrj-input-group label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #b49a70;
-  margin-bottom: 8px;
-}
-
-.mrj-input {
-  width: 100%;
-  box-sizing: border-box;
-  background: #121316;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 6px;
-  padding: 12px 14px;
-  color: #fff;
-  font-size: 14px;
-  transition: all 0.2s ease;
-}
-
-.mrj-input:focus {
-  outline: none;
-  border-color: #b49a70;
-  box-shadow: 0 0 0 3px rgba(180, 154, 112, 0.25);
-  background: #0f1012;
-}
-
-.mrj-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 20px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
-}
-
-.mrj-btn-gold {
-  background: #b49a70;
-  color: #fff;
-  width: 100%;
-}
-
-.mrj-btn-gold:hover {
-  background: #9c8058;
-  transform: translateY(-1px);
-}
-
-.mrj-login-tip {
-  font-size: 11px;
-  color: #71737d;
-  margin-top: 16px;
-}
-
-/* ==========================================================================
-   BARRA SUPERIOR DO ELEMENTOR (ADMIN TOOLBAR)
-   ========================================================================== */
+/* ==============================================================================
+   BARRA SUPERIOR (TOOLBAR DO ELEMENTOR / WIX)
+   ============================================================================== */
 .mrj-admin-bar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 999990;
-  background: #16171b;
-  border-bottom: 1px solid rgba(180, 154, 112, 0.4);
+  background: #14151a;
+  border-bottom: 1px solid var(--admin-border-gold);
   color: #fff;
   font-family: 'DM Sans', sans-serif;
-  height: 52px;
+  height: 54px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  padding: 0 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 body.mrj-admin-active {
-  margin-top: 52px !important;
+  margin-top: 54px !important;
 }
 
 .mrj-admin-brand {
@@ -161,11 +57,11 @@ body.mrj-admin-active {
 }
 
 .mrj-badge-builder {
-  background: linear-gradient(135deg, #b49a70, #8f744e);
+  background: linear-gradient(135deg, var(--admin-gold), #8f744e);
   color: #fff;
   font-size: 10px;
   font-weight: 800;
-  padding: 4px 8px;
+  padding: 4px 9px;
   border-radius: 4px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -183,8 +79,8 @@ body.mrj-admin-active {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
+  background: var(--admin-success);
+  box-shadow: 0 0 8px var(--admin-success);
 }
 
 .mrj-admin-actions {
@@ -194,11 +90,11 @@ body.mrj-admin-active {
 }
 
 .mrj-bar-btn {
-  background: #23252c;
+  background: #20222a;
   color: #e4e4e7;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 7px 12px;
-  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 14px;
+  border-radius: 6px;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -209,19 +105,19 @@ body.mrj-admin-active {
 }
 
 .mrj-bar-btn:hover {
-  background: #2f323c;
-  border-color: #b49a70;
+  background: #2a2d38;
+  border-color: var(--admin-gold);
   color: #fff;
 }
 
 .mrj-bar-btn.active {
-  background: #b49a70;
+  background: var(--admin-gold);
   color: #fff;
-  border-color: #b49a70;
+  border-color: var(--admin-gold);
 }
 
 .mrj-bar-btn-save {
-  background: #10b981;
+  background: var(--admin-success);
   color: #fff;
   border: none;
   font-weight: 700;
@@ -238,20 +134,20 @@ body.mrj-admin-active {
 }
 
 .mrj-bar-btn-exit:hover {
-  color: #f43f5e;
-  background: rgba(244, 63, 94, 0.1);
+  color: var(--admin-danger);
+  background: rgba(239, 68, 68, 0.12);
 }
 
-/* ==========================================================================
-   MODAL PRINCIPAL DE EDIÇÃO E GERENCIAMENTO
-   ========================================================================== */
+/* ==============================================================================
+   MODAL PRINCIPAL DE EDIÇÃO E GERENCIAMENTO (ESTILO WIX CUSTOMIZER)
+   ============================================================================== */
 .mrj-modal-overlay {
   position: fixed;
   inset: 0;
   z-index: 999995;
-  background: rgba(10, 11, 14, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(10, 11, 14, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -262,21 +158,21 @@ body.mrj-admin-active {
 
 .mrj-modal {
   width: 100%;
-  max-width: 860px;
-  max-height: 90vh;
-  background: #191a20;
-  border: 1px solid rgba(180, 154, 112, 0.3);
+  max-width: 920px;
+  max-height: 92vh;
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border-gold);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.85);
   color: #e2e8f0;
 }
 
 .mrj-modal-header {
-  padding: 18px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 18px 26px;
+  border-bottom: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -291,7 +187,7 @@ body.mrj-admin-active {
   color: #fff;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .mrj-modal-close {
@@ -313,8 +209,8 @@ body.mrj-admin-active {
 /* Abas */
 .mrj-tabs-bar {
   display: flex;
-  background: #111216;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #101115;
+  border-bottom: 1px solid var(--admin-border);
   overflow-x: auto;
   padding: 0 16px;
 }
@@ -337,13 +233,13 @@ body.mrj-admin-active {
 }
 
 .mrj-tab-btn.active {
-  color: #b49a70;
-  border-bottom-color: #b49a70;
-  background: rgba(180, 154, 112, 0.06);
+  color: var(--admin-gold);
+  border-bottom-color: var(--admin-gold);
+  background: rgba(180, 154, 112, 0.08);
 }
 
 .mrj-modal-body {
-  padding: 24px;
+  padding: 26px;
   overflow-y: auto;
   flex: 1;
 }
@@ -357,15 +253,50 @@ body.mrj-admin-active {
   animation: mrjFadeIn 0.25s ease;
 }
 
-/* Grid de Form */
+/* Formulários & Grid */
 .mrj-form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
 .mrj-form-full {
   grid-column: 1 / -1;
+}
+
+.mrj-input-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.mrj-input-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--admin-gold);
+  margin-bottom: 7px;
+}
+
+.mrj-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #111215;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 11px 14px;
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.mrj-input:focus {
+  outline: none;
+  border-color: var(--admin-gold);
+  box-shadow: 0 0 0 3px rgba(180, 154, 112, 0.25);
+  background: #0d0e11;
 }
 
 textarea.mrj-input {
@@ -373,12 +304,135 @@ textarea.mrj-input {
   resize: vertical;
 }
 
-/* Área de Upload de Foto */
+/* ==============================================================================
+   CONTROLES DE PALETA DE CORES (ESTILO WIX)
+   ============================================================================== */
+.mrj-color-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #111215;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+
+.mrj-color-picker {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+  padding: 0;
+}
+
+.mrj-color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+.mrj-color-picker::-webkit-color-swatch {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+.mrj-color-hex {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.mrj-color-hex:focus {
+  outline: none;
+}
+
+/* Slider de Opacidade */
+.mrj-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mrj-slider {
+  flex: 1;
+  accent-color: var(--admin-gold);
+  cursor: pointer;
+}
+
+.mrj-slider-value {
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  width: 44px;
+  text-align: right;
+}
+
+/* ==============================================================================
+   SELETOR DE MODO DO HERO (IMAGE / VIDEO LOCAL / EMBED)
+   ============================================================================== */
+.mrj-media-type-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.mrj-media-radio-card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #121317;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mrj-media-radio-card:hover {
+  border-color: var(--admin-gold);
+  background: #181920;
+}
+
+.mrj-media-radio-card.active {
+  border-color: var(--admin-gold);
+  background: rgba(180, 154, 112, 0.12);
+  box-shadow: 0 0 15px rgba(180, 154, 112, 0.2);
+}
+
+.mrj-media-radio-card input {
+  display: none;
+}
+
+.mrj-media-icon {
+  font-size: 22px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.mrj-media-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  display: block;
+}
+
+.mrj-media-sub {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 2px;
+  display: block;
+}
+
+/* Dropzone de Mídia */
 .mrj-upload-box {
   border: 2px dashed rgba(180, 154, 112, 0.4);
   background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
-  padding: 20px;
+  padding: 22px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
@@ -386,32 +440,27 @@ textarea.mrj-input {
 }
 
 .mrj-upload-box:hover {
-  border-color: #b49a70;
-  background: rgba(180, 154, 112, 0.05);
+  border-color: var(--admin-gold);
+  background: rgba(180, 154, 112, 0.06);
 }
 
 .mrj-upload-preview {
   width: 100%;
-  height: 160px;
+  height: 180px;
   object-fit: cover;
   border-radius: 6px;
-  margin-top: 10px;
+  margin-top: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.mrj-upload-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-/* Lista de Empreendimentos */
+/* ==============================================================================
+   LISTA DE EMPREENDIMENTOS
+   ============================================================================== */
 .mrj-project-item {
-  background: #20222a;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--admin-card);
+  border: 1px solid var(--admin-border);
   border-radius: 8px;
-  padding: 14px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -420,15 +469,15 @@ textarea.mrj-input {
 }
 
 .mrj-project-item:hover {
-  border-color: rgba(180, 154, 112, 0.4);
-  background: #252832;
+  border-color: var(--admin-border-gold);
+  background: #252834;
 }
 
 .mrj-project-thumb {
-  width: 80px;
-  height: 60px;
+  width: 84px;
+  height: 64px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 5px;
   flex-shrink: 0;
 }
 
@@ -449,7 +498,7 @@ textarea.mrj-input {
 
 .mrj-project-sub {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--admin-muted);
   margin: 0;
 }
 
@@ -458,107 +507,99 @@ textarea.mrj-input {
   gap: 6px;
 }
 
+.mrj-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.mrj-btn-gold {
+  background: var(--admin-gold);
+  color: #fff;
+}
+
+.mrj-btn-gold:hover {
+  background: var(--admin-gold-hover);
+  transform: translateY(-1px);
+}
+
 .mrj-btn-small {
-  padding: 6px 10px;
+  padding: 7px 11px;
   font-size: 11px;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  background: #2a2d38;
+  background: #282b36;
   color: #fff;
   transition: all 0.15s;
 }
 
 .mrj-btn-small:hover {
-  background: #393c4a;
-  border-color: #b49a70;
+  background: #363a48;
+  border-color: var(--admin-gold);
 }
 
 .mrj-btn-danger:hover {
-  background: #ef4444;
-  border-color: #ef4444;
+  background: var(--admin-danger);
+  border-color: var(--admin-danger);
   color: #fff;
 }
 
-/* Guia Supabase */
-.mrj-guide-box {
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+/* ==============================================================================
+   TABELA DE LEADS
+   ============================================================================== */
+.mrj-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--admin-border);
   border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
-  font-size: 13px;
-  line-height: 1.6;
 }
 
-.mrj-code-snippet {
-  background: #0f1013;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  padding: 12px;
-  font-family: monospace;
+.mrj-table {
+  width: 100%;
+  border-collapse: collapse;
   font-size: 12px;
-  color: #38bdf8;
-  overflow-x: auto;
-  margin: 10px 0;
-  user-select: all;
+  text-align: left;
+}
+
+.mrj-table th {
+  background: #14151a;
+  color: var(--admin-gold);
+  padding: 12px 14px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.mrj-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
+
+.mrj-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
 }
 
 /* Rodapé do Modal */
 .mrj-modal-footer {
-  padding: 16px 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px 26px;
+  border-top: 1px solid var(--admin-border);
   background: #14151a;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* ==========================================================================
-   MODO VISUAL ELEMENTOR (HIGHLIGHTS & BOTÕES INLINE)
-   ========================================================================== */
-body.mrj-visual-mode .project-card,
-body.mrj-visual-mode .hero,
-body.mrj-visual-mode .article-card {
-  position: relative;
-  outline: 2px dashed rgba(180, 154, 112, 0.6);
-  outline-offset: 4px;
-  transition: outline 0.2s;
-}
-
-body.mrj-visual-mode .project-card:hover,
-body.mrj-visual-mode .hero:hover,
-body.mrj-visual-mode .article-card:hover {
-  outline: 2px solid #b49a70;
-}
-
-.mrj-inline-edit-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 50;
-  background: #191a20;
-  color: #b49a70;
-  border: 1px solid #b49a70;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s;
-}
-
-.mrj-inline-edit-btn:hover {
-  background: #b49a70;
-  color: #fff;
-  transform: scale(1.04);
-}
-
-/* Notificação Toast */
+/* Toasts */
 .mrj-toast {
   position: fixed;
   bottom: 24px;
@@ -566,11 +607,10 @@ body.mrj-visual-mode .article-card:hover {
   z-index: 9999999;
   background: #18191f;
   color: #fff;
-  border: 1px solid #10b981;
+  border: 1px solid var(--admin-success);
   border-radius: 8px;
   padding: 14px 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   display: flex;
   align-items: center;
@@ -587,4 +627,3 @@ body.mrj-visual-mode .article-card:hover {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
-

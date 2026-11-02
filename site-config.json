@@ -1,0 +1,69 @@
+{
+  "theme": {
+    "primaryColor": "#b49a70",
+    "primaryHover": "#9c8058",
+    "headerBg": "rgba(255, 255, 255, 0.96)",
+    "footerBg": "#f5eee6",
+    "textPrimary": "#202126",
+    "textSecondary": "#73716d",
+    "heroOverlayOpacity": 0.45
+  },
+  "hero": {
+    "mediaType": "image",
+    "imageUrl": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2200&q=90",
+    "videoUrl": "",
+    "videoPoster": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2200&q=90",
+    "videoEmbed": "",
+    "eyebrow": "SELEÇÃO EXCLUSIVA",
+    "title": "O lugar ideal para você <em>se sentir em casa.</em>",
+    "copy": "Descubra empreendimentos que conectam design, qualidade de vida e uma localização privilegiada nos melhores bairros de São Paulo.",
+    "ctaText": "Encontre seu novo lar",
+    "ctaLink": "#empreendimentos",
+    "highlights": [
+      { "num": "+45", "text": "anos de experiência" },
+      { "num": "Curadoria", "text": "de alto padrão" },
+      { "num": "Atendimento", "text": "personalizado" }
+    ]
+  },
+  "settings": {
+    "brokerName": "MARCIO ROGÉRIO",
+    "brokerMark": "MR",
+    "phoneDisplay": "(41) 99108-0293",
+    "phoneRaw": "5541991080293",
+    "email": "marciorogerio.corretor@gmail.com",
+    "creci": "12345-F",
+    "experienceYears": "+45",
+    "supabaseUrl": "https://wcopjkuhncdzxsriwzgy.supabase.co",
+    "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indjb3Bqa3VobmNkenhzcml3emd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MzUyNjksImV4cCI6MjEwOTIxMTI2OX0.zpKHHp2StajYdQR0iksN3sX5WnYyHmCb7r6Y3jScGaU"
+  },
+  "articles": [
+    {
+      "id": "art-1",
+      "category": "Decoração & design",
+      "date": "12 outubro, 2024",
+      "title": "Como integrar ambientes sociais e varandas com harmonia estética",
+      "description": "Descubra soluções arquitetônicas sofisticadas para ampliar a convivência e trazer mais luz natural para dentro de casa.",
+      "image": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=85",
+      "link": "#contato"
+    },
+    {
+      "id": "art-2",
+      "category": "Tendências urbanas",
+      "date": "28 setembro, 2024",
+      "title": "Higienópolis e Itaim: os bairros que redefinem o luxo discreto",
+      "description": "Uma análise aprofundada sobre a liquidez imobiliária, segurança e a rica oferta cultural dos endereços mais desejados.",
+      "image": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1000&q=85",
+      "link": "#contato"
+    },
+    {
+      "id": "art-3",
+      "category": "Arquitetura & ESG",
+      "date": "15 setembro, 2024",
+      "title": "Eficiência energética e biofilia no desenvolvimento imobiliário",
+      "description": "Como as certificações ambientais e o paisagismo nativo valorizam o metro quadrado e preservam o futuro das cidades.",
+      "image": "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1000&q=85",
+      "link": "#contato"
+    }
+  ]
+}
+

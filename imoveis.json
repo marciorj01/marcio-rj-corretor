@@ -1,0 +1,57 @@
+[
+  {
+    "id": "piaui",
+    "ref": "MR-0101",
+    "name": "Casa Piauí Higienópolis",
+    "location": "HIGIENÓPOLIS · SÃO PAULO / SP",
+    "price": "Consulte valores",
+    "description": "Exclusividade de torre única com arquitetura contemporânea e generosas varandas integradas.",
+    "image": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=85",
+    "status": "lancamento",
+    "statusLabel": "Lançamento",
+    "tagNote": "✦ Alto padrão",
+    "area": "168 a 220 m²",
+    "bedrooms": "3 a 4",
+    "suites": "3 a 4 Suítes",
+    "vagas": "2 a 3 Vagas",
+    "pdfUrl": "",
+    "whatsappMessage": "Olá Marcio, quero saber mais sobre o Casa Piauí Higienópolis (Ref: MR-0101)"
+  },
+  {
+    "id": "havva",
+    "ref": "MR-0102",
+    "name": "Havva Higienópolis",
+    "location": "HIGIENÓPOLIS · SÃO PAULO / SP",
+    "price": "Consulte valores",
+    "description": "Um convite ao equilíbrio urbano com lazer suspenso, acabamentos nobres e vista panorâmica.",
+    "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=85",
+    "status": "obras",
+    "statusLabel": "Em obras",
+    "tagNote": "✧ Personalizável",
+    "area": "142 a 186 m²",
+    "bedrooms": "3",
+    "suites": "3 Suítes",
+    "vagas": "2 Vagas",
+    "pdfUrl": "",
+    "whatsappMessage": "Olá Marcio, quero saber mais sobre o Havva Higienópolis (Ref: MR-0102)"
+  },
+  {
+    "id": "reserva",
+    "ref": "MR-0103",
+    "name": "Reserva Itaim",
+    "location": "ITAIM BIBI · SÃO PAULO / SP",
+    "price": "Consulte valores",
+    "description": "O ápice do requinte corporativo e residencial no centro financeiro e gastronômico da capital.",
+    "image": "https://images.unsplash.com/photo-1448630360428-65456885c650?auto=format&fit=crop&w=1000&q=85",
+    "status": "pronto",
+    "statusLabel": "Pronto para morar",
+    "tagNote": "◈ Entrega imediata",
+    "area": "210 a 380 m²",
+    "bedrooms": "4",
+    "suites": "4 Suítes",
+    "vagas": "3 a 4 Vagas",
+    "pdfUrl": "",
+    "whatsappMessage": "Olá Marcio, quero saber mais sobre o Reserva Itaim (Ref: MR-0103)"
+  }
+]
+
