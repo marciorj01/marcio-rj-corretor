@@ -310,9 +310,17 @@
                     <button type="button" class="mrj-btn mrj-btn-gold" id="btn-trigger-logo-upload" style="width:auto;">📁 Escolher Imagem</button>
                     <input type="text" id="val-logo-image-url" class="mrj-input" placeholder="Ou cole a URL da imagem..." value="${siteData.settings.logoImage || ''}" style="flex:1;" />
                   </div>
-                  <div id="logo-preview-box" style="margin-top:12px; padding:12px; background:#0f1115; border-radius:6px; display:${siteData.settings.logoImage ? 'block' : 'none'}; text-align:center;">
-                    <span style="font-size:11px; color:#94a3b8; display:block; margin-bottom:6px;">Pré-visualização:</span>
-                    <img id="logo-preview-img" src="${siteData.settings.logoImage || ''}" style="max-height:50px; max-width:240px; object-fit:contain;" />
+                  <div class="mrj-input-group" style="margin-top:14px;">
+                    <label style="display:flex; justify-content:space-between; align-items:center;">
+                      <span>Tamanho / Altura da Logomarca no Topo:</span>
+                      <strong id="val-logo-height-disp" style="color:var(--admin-gold); font-size:13px;">${siteData.settings.logoHeight || 52}px</strong>
+                    </label>
+                    <input type="range" id="val-logo-height" min="32" max="80" step="2" value="${siteData.settings.logoHeight || 52}" style="width:100%; cursor:pointer;" />
+                    <span style="font-size:11px; color:#94a3b8; display:block; margin-top:4px;">💡 Ajuste o tamanho da sua logo para ficar grande e nítida no cabeçalho (recomendado: 50px a 68px).</span>
+                  </div>
+                  <div id="logo-preview-box" style="margin-top:12px; padding:16px; background:#0f1115; border-radius:6px; display:${siteData.settings.logoImage ? 'block' : 'none'}; text-align:center;">
+                    <span style="font-size:11px; color:#94a3b8; display:block; margin-bottom:8px;">Pré-visualização:</span>
+                    <img id="logo-preview-img" src="${siteData.settings.logoImage || ''}" style="max-height:${siteData.settings.logoHeight || 52}px; max-width:280px; object-fit:contain; background:transparent;" />
                   </div>
                 </div>
               </div>
@@ -330,6 +338,12 @@
                     <div class="mrj-input-group">
                       <label>Nome do Corretor / Imobiliária</label>
                       <input type="text" id="val-broker-name" class="mrj-input" value="${siteData.settings.brokerName || 'MARCIO ROGÉRIO'}" placeholder="MARCIO ROGÉRIO" />
+                    </div>
+                  </div>
+                  <div class="mrj-form-full">
+                    <div class="mrj-input-group">
+                      <label>Registro Profissional / CRECI</label>
+                      <input type="text" id="val-broker-creci" class="mrj-input" value="${siteData.settings.creci || ''}" placeholder="Ex: CRECI 12345-F / PR" />
                     </div>
                   </div>
                 </div>
@@ -728,6 +742,31 @@
       });
     }
 
+    // Slider de Altura da Logomarca (Tempo Real)
+    const sliderLogoHeight = overlay.querySelector("#val-logo-height");
+    const dispLogoHeight = overlay.querySelector("#val-logo-height-disp");
+    if (sliderLogoHeight) {
+      sliderLogoHeight.addEventListener("input", (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (dispLogoHeight) dispLogoHeight.textContent = val + "px";
+        if (logoPrevImg) logoPrevImg.style.maxHeight = val + "px";
+        siteData.settings.logoHeight = val;
+        renderSiteFromData();
+      });
+    }
+
+    // Sincronização automática entre o campo de Nome da Logo e o campo de Nome dos Contatos
+    const valBrokerName = overlay.querySelector("#val-broker-name");
+    const valConfName = overlay.querySelector("#val-conf-name");
+    if (valBrokerName && valConfName) {
+      valBrokerName.addEventListener("input", (e) => {
+        valConfName.value = e.target.value;
+      });
+      valConfName.addEventListener("input", (e) => {
+        valBrokerName.value = e.target.value;
+      });
+    }
+
     // Gerenciador da Lista de Links do Menu
     function renderMenuRows() {
       const listEl = overlay.querySelector("#admin-menu-links-list");
@@ -1019,14 +1058,24 @@
       siteData.settings.logoType = selLogoRadio ? selLogoRadio.value : "text";
       siteData.settings.logoImage = overlay.querySelector("#val-logo-image-url") ? overlay.querySelector("#val-logo-image-url").value.trim() : "";
       
+      const sliderHeightInp = overlay.querySelector("#val-logo-height");
+      if (sliderHeightInp) {
+        siteData.settings.logoHeight = parseInt(sliderHeightInp.value, 10) || 52;
+      }
+
       const brokerMarkInp = overlay.querySelector("#val-broker-mark");
       if (brokerMarkInp && brokerMarkInp.value.trim()) {
         siteData.settings.brokerMark = brokerMarkInp.value.trim();
       }
 
-      const brokerNameInp = overlay.querySelector("#val-broker-name");
+      const brokerNameInp = overlay.querySelector("#val-broker-name") || overlay.querySelector("#val-conf-name");
       if (brokerNameInp && brokerNameInp.value.trim()) {
         siteData.settings.brokerName = brokerNameInp.value.trim();
+      }
+
+      const brokerCreciInp = overlay.querySelector("#val-broker-creci");
+      if (brokerCreciInp) {
+        siteData.settings.creci = brokerCreciInp.value.trim();
       }
 
       const chkHeaderCta = overlay.querySelector("#chk-show-header-cta");
@@ -1054,11 +1103,7 @@
         siteData.settings.menuLinks = updatedMenuLinks;
       }
 
-      // Atualiza Contatos
-      const confNameInp = overlay.querySelector("#val-conf-name");
-      if (confNameInp && confNameInp.value.trim()) siteData.settings.brokerName = confNameInp.value.trim();
-      const confMarkInp = overlay.querySelector("#val-conf-mark");
-      if (confMarkInp && confMarkInp.value.trim()) siteData.settings.brokerMark = confMarkInp.value.trim();
+      // Atualiza Contatos (SEM sobrescrever o brokerName)
       siteData.settings.phoneDisplay = overlay.querySelector("#val-conf-phone-disp").value.trim();
       siteData.settings.phoneRaw = overlay.querySelector("#val-conf-phone-raw").value.trim();
       siteData.settings.email = overlay.querySelector("#val-conf-email").value.trim();

@@ -63,8 +63,8 @@ button { font: inherit; }
 
 .wordmark { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .wordmark-image {
-  max-height: 46px;
-  max-width: 220px;
+  max-height: 75px;
+  max-width: 280px;
   width: auto;
   height: auto;
   object-fit: contain;

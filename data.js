@@ -15,8 +15,10 @@ const DEFAULT_SITE_DATA = {
   settings: {
     logoType: "text", // "text" | "image"
     logoImage: "",
+    logoHeight: 52, // Altura em pixels da logomarca
     brokerName: "MARCIO ROGÉRIO",
     brokerMark: "MR",
+    creci: "12345-F",
     brokerSubtitle: "Corretor de Imóveis",
     showHeaderCta: false, // Controla exibição do botão no canto direito
     headerCtaText: "Fale comigo",

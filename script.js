@@ -111,12 +111,25 @@ function renderSiteFromData() {
   const footerLogoMark = document.getElementById("footer-logo-mark");
   const footerLogoText = document.getElementById("footer-logo-text");
 
+  const logoHeight = data.settings?.logoHeight || 52;
+  const creci = data.settings?.creci || "";
+
   if (logoType === "image" && logoImage) {
-    if (siteLogoImg) { siteLogoImg.src = logoImage; siteLogoImg.style.display = "block"; }
+    if (siteLogoImg) {
+      siteLogoImg.src = logoImage;
+      siteLogoImg.style.display = "block";
+      siteLogoImg.style.height = `${logoHeight}px`;
+      siteLogoImg.style.maxHeight = `${logoHeight}px`;
+    }
     if (siteLogoMark) siteLogoMark.style.display = "none";
     if (siteLogoText) siteLogoText.style.display = "none";
 
-    if (footerLogoImg) { footerLogoImg.src = logoImage; footerLogoImg.style.display = "block"; }
+    if (footerLogoImg) {
+      footerLogoImg.src = logoImage;
+      footerLogoImg.style.display = "block";
+      footerLogoImg.style.height = `${logoHeight}px`;
+      footerLogoImg.style.maxHeight = `${logoHeight}px`;
+    }
     if (footerLogoMark) footerLogoMark.style.display = "none";
     if (footerLogoText) footerLogoText.style.display = "none";
   } else {
@@ -130,10 +143,11 @@ function renderSiteFromData() {
 
     document.querySelectorAll(".wordmark-mark").forEach(el => el.textContent = brokerMark);
     document.querySelectorAll(".wordmark-name").forEach(el => {
+      const creciHtml = creci ? `<span class="broker-creci-tag" style="display:block; font-size:9px; font-weight:600; letter-spacing:0.12em; color:var(--gold-dark); margin-top:2px;">${creci}</span>` : '';
       const parts = brokerName.split(" ");
       const first = parts[0] || "MARCIO";
-      const rest = parts.slice(1).join(" ") || "ROGÉRIO";
-      el.innerHTML = `${first} <strong>${rest}</strong>`;
+      const rest = parts.slice(1).join(" ") || "";
+      el.innerHTML = `${first} <strong>${rest}</strong>${creciHtml}`;
     });
   }
 
