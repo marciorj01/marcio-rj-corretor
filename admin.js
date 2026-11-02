@@ -271,6 +271,7 @@
 
         <div class="mrj-tabs-bar">
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-branding' ? 'active' : ''}" data-target="tab-branding">🏷️ Logomarca & Menu</button>
+          <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-sections' ? 'active' : ''}" data-target="tab-sections">🧱 Blocos do Site</button>
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-theme' ? 'active' : ''}" data-target="tab-theme">🎨 Cores & Design</button>
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-hero' ? 'active' : ''}" data-target="tab-hero">🎬 Capa Multimídia (Vídeo/Foto)</button>
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-projects' ? 'active' : ''}" data-target="tab-projects">🏢 Imóveis (${siteData.projects.length})</button>
@@ -281,6 +282,61 @@
         </div>
 
         <div class="mrj-modal-body">
+          <!-- ABA: GESTÃO DE BLOCOS E SEÇÕES -->
+          <div class="mrj-tab-content ${defaultTab === 'tab-sections' ? 'active' : ''}" id="tab-sections">
+            <h4 style="margin:0 0 6px; color:#fff; font-size:14px;">Controle dos Blocos da Página</h4>
+            <p style="font-size:12px; color:#94a3b8; margin-top:0;">Você tem total liberdade para exibir, ocultar ou renomear qualquer bloco do seu site.</p>
+
+            <!-- Bloco 1: Empreendimentos -->
+            <div style="background:#14151a; border:1px solid #282b36; border-radius:8px; padding:16px; margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:#fff; font-size:13px;">
+                  <input type="checkbox" id="chk-sec-proj-vis" ${siteData.sections?.projects?.visible !== false ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+                  <span>🏢 Bloco de Imóveis (Empreendimentos em Destaque)</span>
+                </label>
+                <button type="button" class="mrj-btn-small" id="btn-sec-add-proj" style="background:var(--admin-gold); color:#14151a; font-weight:700;">➕ Criar Outro Imóvel Neste Bloco</button>
+              </div>
+              <div class="mrj-form-grid">
+                <div>
+                  <div class="mrj-input-group">
+                    <label>Título do Bloco</label>
+                    <input type="text" id="val-sec-proj-title" class="mrj-input" value="${siteData.sections?.projects?.title || 'Empreendimentos em Destaque'}" />
+                  </div>
+                </div>
+                <div>
+                  <div class="mrj-input-group">
+                    <label>Selo / Sobretítulo (Eyebrow)</label>
+                    <input type="text" id="val-sec-proj-eye" class="mrj-input" value="${siteData.sections?.projects?.eyebrow || 'SELEÇÃO EXCLUSIVA'}" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bloco 2: Conteúdos & Blog -->
+            <div style="background:#14151a; border:1px solid #282b36; border-radius:8px; padding:16px; margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:#fff; font-size:13px;">
+                  <input type="checkbox" id="chk-sec-art-vis" ${siteData.sections?.articles?.visible !== false ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+                  <span>📰 Bloco de Conteúdos & Blog ("Leia Helbor")</span>
+                </label>
+                <span style="font-size:11px; color:#94a3b8;">Desmarque se preferir não exibir esse bloco no site.</span>
+              </div>
+              <div class="mrj-form-grid">
+                <div>
+                  <div class="mrj-input-group">
+                    <label>Título da Seção de Conteúdos</label>
+                    <input type="text" id="val-sec-art-title" class="mrj-input" value="${siteData.sections?.articles?.title || 'Conteúdos para você se inspirar'}" />
+                  </div>
+                </div>
+                <div>
+                  <div class="mrj-input-group">
+                    <label>Selo / Sobretítulo (Substitua "LEIA HELBOR")</label>
+                    <input type="text" id="val-sec-art-eye" class="mrj-input" value="${siteData.sections?.articles?.eyebrow || 'LEIA MAIS'}" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <!-- ABA 0: LOGOMARCA & MENU DE NAVEGAÇÃO -->
           <div class="mrj-tab-content ${defaultTab === 'tab-branding' ? 'active' : ''}" id="tab-branding">
             <h4 style="margin:0 0 6px; color:#fff; font-size:14px;">Personalização da Logomarca</h4>
@@ -1000,6 +1056,14 @@
       });
     }
 
+    const btnSecAddProj = overlay.querySelector("#btn-sec-add-proj");
+    if (btnSecAddProj) {
+      btnSecAddProj.addEventListener("click", () => {
+        overlay.remove();
+        openProjectModal(null);
+      });
+    }
+
     setupProjectsListEvents(overlay);
     setupArticlesListEvents(overlay);
 
@@ -1103,6 +1167,32 @@
         siteData.settings.menuLinks = updatedMenuLinks;
       }
 
+      // Atualiza Gestão de Blocos e Seções
+      if (!siteData.sections) siteData.sections = {};
+      const chkSecProjVis = overlay.querySelector("#chk-sec-proj-vis");
+      const valSecProjTitle = overlay.querySelector("#val-sec-proj-title");
+      const valSecProjEye = overlay.querySelector("#val-sec-proj-eye");
+      if (chkSecProjVis) {
+        siteData.sections.projects = {
+          visible: chkSecProjVis.checked,
+          title: valSecProjTitle ? valSecProjTitle.value.trim() : "Empreendimentos em Destaque",
+          eyebrow: valSecProjEye ? valSecProjEye.value.trim() : "SELEÇÃO EXCLUSIVA",
+          intro: siteData.sections?.projects?.intro || "Conheça lançamentos e obras de excelência pensados rigorosamente para o seu conforto, segurança e valorização patrimonial."
+        };
+      }
+
+      const chkSecArtVis = overlay.querySelector("#chk-sec-art-vis");
+      const valSecArtTitle = overlay.querySelector("#val-sec-art-title");
+      const valSecArtEye = overlay.querySelector("#val-sec-art-eye");
+      if (chkSecArtVis) {
+        siteData.sections.articles = {
+          visible: chkSecArtVis.checked,
+          title: valSecArtTitle ? valSecArtTitle.value.trim() : "Conteúdos para você se inspirar",
+          eyebrow: valSecArtEye ? valSecArtEye.value.trim() : "LEIA MAIS",
+          intro: siteData.sections?.articles?.intro || "Tendências de arquitetura internacional, valorização imobiliária, design de interiores e lifestyle urbano."
+        };
+      }
+
       // Atualiza Contatos (SEM sobrescrever o brokerName)
       siteData.settings.phoneDisplay = overlay.querySelector("#val-conf-phone-disp").value.trim();
       siteData.settings.phoneRaw = overlay.querySelector("#val-conf-phone-raw").value.trim();
@@ -1174,6 +1264,52 @@
       </div>
     `;
   }
+
+  // Operações Rápidas de Blocos de Imóveis (Criar, Duplicar, Excluir)
+  function cloneProject(projectId) {
+    const proj = siteData.projects.find(p => p.id === projectId);
+    if (!proj) return;
+    const cloned = JSON.parse(JSON.stringify(proj));
+    cloned.id = "proj-" + Date.now();
+    cloned.name = cloned.name + " (Cópia)";
+    cloned.ref = "MR-" + Math.floor(1000 + Math.random() * 9000);
+    siteData.projects.unshift(cloned);
+    saveSiteData(siteData);
+    renderSiteFromData();
+    publishAllChanges();
+    showToast(`Novo bloco de imóvel criado: "${cloned.name}"!`);
+  }
+
+  function deleteProject(projectId) {
+    const proj = siteData.projects.find(p => p.id === projectId);
+    if (!proj) return;
+    if (confirm(`Tem certeza que deseja excluir o bloco do imóvel "${proj.name}"?`)) {
+      siteData.projects = siteData.projects.filter(p => p.id !== projectId);
+      saveSiteData(siteData);
+      renderSiteFromData();
+      publishAllChanges();
+      showToast(`Imóvel "${proj.name}" excluído.`);
+    }
+  }
+
+  function toggleSection(secKey) {
+    if (!siteData.sections) siteData.sections = {};
+    if (!siteData.sections[secKey]) siteData.sections[secKey] = { visible: true };
+    siteData.sections[secKey].visible = !siteData.sections[secKey].visible;
+    saveSiteData(siteData);
+    renderSiteFromData();
+    publishAllChanges();
+    showToast(siteData.sections[secKey].visible ? "Bloco ativado e visível!" : "Bloco ocultado da página inicial.");
+  }
+
+  // Expõe API para controles inline visuais do site
+  window.MRJ_ADMIN = {
+    openProjectModal,
+    cloneProject,
+    deleteProject,
+    toggleSection,
+    openGeneralModal
+  };
 
   // Modal de Adicionar / Editar Imóvel
   function openProjectModal(projectId = null) {
@@ -1489,14 +1625,23 @@
         <div class="mrj-item-actions">
           <button type="button" class="mrj-btn-small mrj-proj-up" data-idx="${idx}" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''}>▲</button>
           <button type="button" class="mrj-btn-small mrj-proj-down" data-idx="${idx}" ${idx === siteData.projects.length - 1 ? 'disabled style="opacity:0.4;"' : ''}>▼</button>
+          <button type="button" class="mrj-btn-small mrj-proj-clone" data-id="${proj.id}" title="Duplicar e criar outro imóvel igual">📋 Duplicar</button>
           <button type="button" class="mrj-btn-small mrj-proj-edit" data-id="${proj.id}">✏️ Editar</button>
-          <button type="button" class="mrj-btn-small mrj-btn-danger mrj-proj-del" data-id="${proj.id}">🗑</button>
+          <button type="button" class="mrj-btn-small mrj-btn-danger mrj-proj-del" data-id="${proj.id}" title="Excluir imóvel">🗑</button>
         </div>
       </div>
     `).join("");
   }
 
   function setupProjectsListEvents(container) {
+    container.querySelectorAll(".mrj-proj-clone").forEach(btn => {
+      btn.addEventListener("click", () => {
+        cloneProject(btn.dataset.id);
+        container.querySelector("#admin-projects-list").innerHTML = renderProjectsListHtml();
+        setupProjectsListEvents(container);
+      });
+    });
+
     container.querySelectorAll(".mrj-proj-edit").forEach(btn => {
       btn.addEventListener("click", () => {
         container.remove();

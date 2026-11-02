@@ -54,6 +54,20 @@ const DEFAULT_SITE_DATA = {
       { num: "Atendimento", text: "personalizado" }
     ]
   },
+  sections: {
+    projects: {
+      visible: true,
+      eyebrow: "SELEÇÃO EXCLUSIVA HELBOR",
+      title: "Empreendimentos em Destaque",
+      intro: "Conheça lançamentos e obras de excelência pensados rigorosamente para o seu conforto, segurança e valorização patrimonial."
+    },
+    articles: {
+      visible: true,
+      eyebrow: "LEIA HELBOR",
+      title: "Conteúdos para você se inspirar",
+      intro: "Tendências de arquitetura internacional, valorização imobiliária, design de interiores e lifestyle urbano."
+    }
+  },
   projects: [
     {
       id: "piaui",

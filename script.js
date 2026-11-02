@@ -259,7 +259,52 @@ function renderSiteFromData() {
     setProjectFilter(activeFilter);
   }
 
-  // 6. Renderizar Artigos / Blog
+  // 6. Gerenciar Visibilidade e Textos das Seções/Blocos
+  const projSection = document.getElementById("empreendimentos");
+  if (projSection) {
+    const pSec = data.sections?.projects;
+    if (pSec && pSec.visible === false) {
+      projSection.style.display = "none";
+    } else {
+      projSection.style.display = "";
+      if (pSec?.title) {
+        const titleEl = document.getElementById("projects-title");
+        if (titleEl) titleEl.textContent = pSec.title;
+      }
+      if (pSec?.eyebrow) {
+        const eyeEl = projSection.querySelector(".eyebrow");
+        if (eyeEl) eyeEl.textContent = pSec.eyebrow;
+      }
+      if (pSec?.intro) {
+        const introEl = projSection.querySelector(".section-intro");
+        if (introEl) introEl.textContent = pSec.intro;
+      }
+    }
+  }
+
+  const artSection = document.getElementById("conteudos");
+  if (artSection) {
+    const aSec = data.sections?.articles;
+    if (aSec && aSec.visible === false) {
+      artSection.style.display = "none";
+    } else {
+      artSection.style.display = "";
+      if (aSec?.title) {
+        const titleEl = document.getElementById("editorial-title");
+        if (titleEl) titleEl.textContent = aSec.title;
+      }
+      if (aSec?.eyebrow) {
+        const eyeEl = artSection.querySelector(".eyebrow");
+        if (eyeEl) eyeEl.textContent = aSec.eyebrow;
+      }
+      if (aSec?.intro) {
+        const introEl = artSection.querySelector(".section-intro");
+        if (introEl) introEl.textContent = aSec.intro;
+      }
+    }
+  }
+
+  // 7. Renderizar Artigos / Blog
   const articleGrid = document.getElementById("articles-container") || document.querySelector(".article-grid");
   if (articleGrid && Array.isArray(data.articles)) {
     articleGrid.innerHTML = data.articles.map(art => `
@@ -276,6 +321,96 @@ function renderSiteFromData() {
         <a class="article-link" href="${art.link || '#contato'}">Ler matéria <span aria-hidden="true">→</span></a>
       </article>
     `).join("");
+  }
+
+  // 8. Injetar Controles Visuais Elementor/Wix se Administrador estiver Logado
+  if (typeof attachInlineAdminControls === "function") {
+    setTimeout(attachInlineAdminControls, 100);
+  }
+}
+
+// Injeta botões visuais diretamente na página quando o corretor está no modo admin
+function attachInlineAdminControls() {
+  const isAdmin = sessionStorage.getItem("mrj_admin_auth_v2") === "true" || localStorage.getItem("mrj_admin_auth_v2") === "true";
+  if (!isAdmin || typeof window.MRJ_ADMIN === "undefined") return;
+
+  // 1. Barra de Ação no topo da seção de Empreendimentos
+  const projSection = document.getElementById("empreendimentos");
+  if (projSection && !projSection.querySelector("#mrj-section-admin-proj")) {
+    const bar = document.createElement("div");
+    bar.id = "mrj-section-admin-proj";
+    bar.className = "mrj-section-admin-bar";
+    bar.innerHTML = `
+      <button type="button" class="mrj-section-add-btn" id="mrj-inline-add-proj">
+        ➕ Criar Outro Imóvel Neste Bloco
+      </button>
+      <button type="button" class="mrj-section-del-btn" id="mrj-inline-hide-proj">
+        👁️ Ocultar / Excluir Este Bloco
+      </button>
+    `;
+    const heading = projSection.querySelector(".section-heading");
+    if (heading) heading.after(bar);
+    else projSection.prepend(bar);
+
+    bar.querySelector("#mrj-inline-add-proj").addEventListener("click", () => {
+      window.MRJ_ADMIN.openProjectModal(null);
+    });
+    bar.querySelector("#mrj-inline-hide-proj").addEventListener("click", () => {
+      window.MRJ_ADMIN.toggleSection("projects");
+    });
+  }
+
+  // 2. Botões flutuantes em cima de cada card de Imóvel
+  document.querySelectorAll(".project-card").forEach(card => {
+    if (card.querySelector(".mrj-card-admin-overlay")) return;
+    const btnLead = card.querySelector(".mrj-open-lead-btn");
+    const projId = btnLead ? btnLead.dataset.projectId : null;
+    if (!projId) return;
+
+    const overlay = document.createElement("div");
+    overlay.className = "mrj-card-admin-overlay";
+    overlay.innerHTML = `
+      <button type="button" class="mrj-card-admin-btn mrj-inline-edit" title="Editar este imóvel">✏️ Editar</button>
+      <button type="button" class="mrj-card-admin-btn mrj-inline-clone" title="Duplicar e criar outro imóvel igual">📋 Duplicar</button>
+      <button type="button" class="mrj-card-admin-btn mrj-card-del mrj-inline-del" title="Excluir este bloco">🗑️ Excluir</button>
+    `;
+    card.prepend(overlay);
+
+    overlay.querySelector(".mrj-inline-edit").addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      window.MRJ_ADMIN.openProjectModal(projId);
+    });
+    overlay.querySelector(".mrj-inline-clone").addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      window.MRJ_ADMIN.cloneProject(projId);
+    });
+    overlay.querySelector(".mrj-inline-del").addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      window.MRJ_ADMIN.deleteProject(projId);
+    });
+  });
+
+  // 3. Barra de Ação no topo da seção de Notícias / Leia Helbor
+  const artSection = document.getElementById("conteudos");
+  if (artSection && !artSection.querySelector("#mrj-section-admin-art")) {
+    const bar = document.createElement("div");
+    bar.id = "mrj-section-admin-art";
+    bar.className = "mrj-section-admin-bar";
+    bar.innerHTML = `
+      <button type="button" class="mrj-section-del-btn" id="mrj-inline-toggle-art">
+        🗑️ Ocultar / Excluir Este Bloco Inteiro ("Leia Helbor")
+      </button>
+    `;
+    const heading = artSection.querySelector(".section-heading");
+    if (heading) heading.after(bar);
+    else artSection.prepend(bar);
+
+    bar.querySelector("#mrj-inline-toggle-art").addEventListener("click", () => {
+      window.MRJ_ADMIN.toggleSection("articles");
+    });
   }
 }
 
