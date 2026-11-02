@@ -38,6 +38,7 @@ const DEFAULT_SITE_DATA = {
       area: "168 a 220 m²",
       suites: "3 a 4 Suítes",
       vagas: "2 a 3 Vagas",
+      pdfUrl: "",
       whatsappMessage: "Quero saber mais sobre o Casa Piaui Higienopolis"
     },
     {
@@ -52,6 +53,7 @@ const DEFAULT_SITE_DATA = {
       area: "142 a 186 m²",
       suites: "3 Suítes",
       vagas: "2 Vagas",
+      pdfUrl: "",
       whatsappMessage: "Quero saber mais sobre o Havva Higienopolis"
     },
     {
@@ -66,6 +68,7 @@ const DEFAULT_SITE_DATA = {
       area: "210 a 380 m²",
       suites: "4 Suítes",
       vagas: "3 a 4 Vagas",
+      pdfUrl: "",
       whatsappMessage: "Quero saber mais sobre o Reserva Itaim"
     }
   ],
@@ -157,4 +160,72 @@ async function fetchSupabaseData(url, key) {
     console.warn("Supabase fetch indisponível ou offline:", err);
   }
   return null;
+}
+
+// Salvar Lead (Supabase + Local Backup)
+async function submitLead(lead) {
+  const currentData = getSiteData();
+  const url = currentData.settings?.supabaseUrl;
+  const key = currentData.settings?.supabaseKey;
+
+  // 1. Salvar localmente no navegador (sempre garantido)
+  try {
+    const localLeads = JSON.parse(localStorage.getItem("mrj_leads_backup") || "[]");
+    localLeads.unshift({ ...lead, id: Date.now(), created_at: new Date().toISOString() });
+    localStorage.setItem("mrj_leads_backup", JSON.stringify(localLeads));
+  } catch (e) {
+    console.warn("Erro ao salvar lead local:", e);
+  }
+
+  // 2. Salvar no Supabase
+  if (url && key) {
+    try {
+      const endpoint = `${url.replace(/\/$/, '')}/rest/v1/leads`;
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "apikey": key,
+          "Authorization": `Bearer ${key}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify(lead)
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn("Falha ao enviar lead para Supabase:", err);
+    }
+  }
+  return true;
+}
+
+// Buscar Lista de Leads para o Painel Administrativo
+async function getLeadsList() {
+  const currentData = getSiteData();
+  const url = currentData.settings?.supabaseUrl;
+  const key = currentData.settings?.supabaseKey;
+
+  if (url && key) {
+    try {
+      const endpoint = `${url.replace(/\/$/, '')}/rest/v1/leads?select=*&order=created_at.desc`;
+      const res = await fetch(endpoint, {
+        headers: {
+          "apikey": key,
+          "Authorization": `Bearer ${key}`
+        }
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (err) {
+      console.warn("Erro ao buscar leads do Supabase:", err);
+    }
+  }
+
+  // Fallback para leads salvos no navegador
+  try {
+    return JSON.parse(localStorage.getItem("mrj_leads_backup") || "[]");
+  } catch (e) {
+    return [];
+  }
 }

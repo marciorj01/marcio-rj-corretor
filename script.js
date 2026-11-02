@@ -97,7 +97,7 @@ function renderSiteFromData() {
               <div><dt>Vagas</dt><dd>${project.vagas || '-'}</dd></div>
             </dl>
             <div class="project-actions">
-              <a href="${waLink}" target="_blank" rel="noreferrer">Conheça o projeto <span aria-hidden="true">→</span></a>
+              <a href="${waLink}" class="mrj-open-lead-btn" data-project-id="${project.id}">Conheça o projeto <span aria-hidden="true">→</span></a>
               <button class="favorite-button" type="button" aria-label="Adicionar ${project.name} aos favoritos" aria-pressed="false" data-favorite="${project.id}" data-name="${project.name}">♡</button>
             </div>
           </div>
@@ -107,6 +107,7 @@ function renderSiteFromData() {
 
     // Reconectar eventos de favoritos e aplicar filtro ativo
     setupFavoriteButtons();
+    setupLeadModalTriggers();
     setProjectFilter(activeFilter);
   }
 
@@ -184,6 +185,121 @@ function setupFavoriteButtons() {
       );
       localStorage.setItem(key, String(nextValue));
     };
+  });
+}
+
+// ==========================================================================
+// MODAL DE CAPTURA DE LEADS (DOWNLOAD DO BOOK / PDF)
+// ==========================================================================
+
+function setupLeadModalTriggers() {
+  document.querySelectorAll(".mrj-open-lead-btn").forEach((link) => {
+    link.onclick = (e) => {
+      e.preventDefault();
+      openLeadModal(link.dataset.projectId);
+    };
+  });
+}
+
+function openLeadModal(projectId) {
+  const data = typeof getSiteData === "function" ? getSiteData() : DEFAULT_SITE_DATA;
+  const project = data.projects.find((p) => p.id === projectId) || data.projects[0];
+  const phoneRaw = data.settings?.phoneRaw || "5541991080293";
+
+  const overlay = document.createElement("div");
+  overlay.className = "mrj-lead-overlay";
+  overlay.innerHTML = `
+    <div class="mrj-lead-modal">
+      <div class="mrj-lead-header">
+        <button type="button" class="mrj-lead-close" aria-label="Fechar">✕</button>
+        <span style="font-size:9px; color:#b49a70; font-weight:700; letter-spacing:0.12em; text-transform:uppercase;">APRESENTAÇÃO EXCLUSIVA</span>
+        <h3>${project.name}</h3>
+        <p>Preencha os dados abaixo para receber o book digital com plantas, diferenciais e valores.</p>
+      </div>
+
+      <div class="mrj-lead-body" id="mrj-lead-body-content">
+        <form id="mrj-lead-form">
+          <div class="mrj-lead-group">
+            <label for="mrj-lead-name">Seu Nome Completo *</label>
+            <input type="text" id="mrj-lead-name" class="mrj-lead-input" placeholder="Ex: João da Silva" required />
+          </div>
+
+          <div class="mrj-lead-group">
+            <label for="mrj-lead-phone">WhatsApp com DDD *</label>
+            <input type="tel" id="mrj-lead-phone" class="mrj-lead-input" placeholder="(11) 99999-9999" required />
+          </div>
+
+          <div class="mrj-lead-group">
+            <label for="mrj-lead-email">E-mail para envio do Book</label>
+            <input type="email" id="mrj-lead-email" class="mrj-lead-input" placeholder="seuemail@exemplo.com" />
+          </div>
+
+          <button type="submit" class="mrj-lead-submit" id="mrj-lead-submit-btn">
+            <span>Acessar Book em PDF</span> <span>📥</span>
+          </button>
+
+          <div class="mrj-lead-security">
+            <span>🔒</span> <span>Seus dados estão protegidos. Atendimento exclusivo e discreto.</span>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Fechar modal
+  overlay.querySelector(".mrj-lead-close").addEventListener("click", () => overlay.remove());
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  // Enviar Lead
+  const form = overlay.querySelector("#mrj-lead-form");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = overlay.querySelector("#mrj-lead-submit-btn");
+    btn.disabled = true;
+    btn.innerHTML = `<span>Processando solicitação...</span>`;
+
+    const name = overlay.querySelector("#mrj-lead-name").value.trim();
+    const phone = overlay.querySelector("#mrj-lead-phone").value.trim();
+    const email = overlay.querySelector("#mrj-lead-email").value.trim();
+
+    const lead = {
+      name,
+      phone,
+      email,
+      project_id: project.id,
+      project_name: project.name,
+      created_at: new Date().toISOString()
+    };
+
+    if (typeof submitLead === "function") {
+      await submitLead(lead);
+    }
+
+    // Se houver PDF cadastrado, abre em nova aba
+    if (project.pdfUrl) {
+      window.open(project.pdfUrl, "_blank");
+    }
+
+    // Tela de sucesso
+    const bodyContent = overlay.querySelector("#mrj-lead-body-content");
+    const zapMsg = encodeURIComponent(`Olá Marcio Rogério! Sou ${name}, acabei de solicitar o Book do ${project.name} no site e gostaria de mais detalhes.`);
+    const zapDirect = `https://wa.me/${phoneRaw}?text=${zapMsg}`;
+
+    bodyContent.innerHTML = `
+      <div class="mrj-lead-success">
+        <div style="font-size:36px; margin-bottom:8px; color:#10b981;">✓</div>
+        <h4>Solicitação Recebida com Sucesso!</h4>
+        <p style="margin-bottom:20px;">Obrigado, <strong>${name}</strong>. ${project.pdfUrl ? "O material foi aberto em nova aba." : "Nossa equipe já preparou a apresentação completa para você."}</p>
+        
+        <a href="${zapDirect}" target="_blank" rel="noreferrer" class="button button-gold" style="width:100%; box-sizing:border-box;">
+          Conversar Agora no WhatsApp ↗
+        </a>
+      </div>
+    `;
   });
 }
 

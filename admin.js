@@ -360,6 +360,14 @@
 
             <div class="mrj-form-full">
               <div class="mrj-input-group">
+                <label>📄 Link do PDF / Book de Apresentação (Download do Lead)</label>
+                <input type="url" id="mrj-proj-pdf" class="mrj-input" value="${project.pdfUrl || ''}" placeholder="Ex: https://meusite.com/books/casa-piaui.pdf ou link do Google Drive/Supabase" />
+                <small style="color:#94a3b8; font-size:11px;">Quando o visitante clica em 'Conheça o projeto', ele preenche o formulário de lead e baixa este PDF.</small>
+              </div>
+            </div>
+
+            <div class="mrj-form-full">
+              <div class="mrj-input-group">
                 <label>Descrição Resumida</label>
                 <textarea id="mrj-proj-desc" class="mrj-input" placeholder="Breve apresentação dos diferenciais do projeto...">${project.description}</textarea>
               </div>
@@ -441,6 +449,7 @@
       project.suites = overlay.querySelector("#mrj-proj-suites").value.trim();
       project.vagas = overlay.querySelector("#mrj-proj-vagas").value.trim();
       project.whatsappMessage = overlay.querySelector("#mrj-proj-msg").value.trim() || `Quero saber mais sobre o ${name}`;
+      project.pdfUrl = overlay.querySelector("#mrj-proj-pdf") ? overlay.querySelector("#mrj-proj-pdf").value.trim() : "";
 
       if (!isEditing) {
         siteData.projects.unshift(project);
@@ -481,6 +490,7 @@
 
         <div class="mrj-tabs-bar">
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-projects' ? 'active' : ''}" data-target="tab-projects">🏢 Imóveis (${siteData.projects.length})</button>
+          <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-leads' ? 'active' : ''}" data-target="tab-leads">📥 Leads Capturados</button>
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-hero' ? 'active' : ''}" data-target="tab-hero">🖼️ Capa (Hero)</button>
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-articles' ? 'active' : ''}" data-target="tab-articles">📰 Artigos & Blog</button>
           <button type="button" class="mrj-tab-btn ${defaultTab === 'tab-contacts' ? 'active' : ''}" data-target="tab-contacts">📞 Contatos & WhatsApp</button>
@@ -497,6 +507,23 @@
             </div>
             <div id="mrj-projects-list">
               ${renderProjectsListHtml()}
+            </div>
+          </div>
+
+          <!-- ABA: LEADS CAPTURADOS -->
+          <div class="mrj-tab-content ${defaultTab === 'tab-leads' ? 'active' : ''}" id="tab-leads">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+              <div>
+                <h4 style="margin:0 0 4px; color:#fff; font-size:14px;">Contatos que solicitaram Books / PDFs</h4>
+                <span style="font-size:11px; color:#94a3b8;">Sincronizados com a tabela 'leads' no Supabase.</span>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="mrj-btn-small" id="mrj-btn-refresh-leads">🔄 Atualizar</button>
+                <button type="button" class="mrj-btn-small" id="mrj-btn-export-leads" style="background:#10b981; border-color:#10b981; color:#fff;">📊 Baixar Excel/CSV</button>
+              </div>
+            </div>
+            <div id="mrj-leads-table-container">
+              <p style="text-align:center; color:#94a3b8; padding:30px;">Carregando contatos...</p>
             </div>
           </div>
 
@@ -661,9 +688,92 @@
 
         btn.classList.add("active");
         const target = overlay.querySelector("#" + btn.dataset.target);
-        if (target) target.classList.add("active");
+        if (target) {
+          target.classList.add("active");
+          if (btn.dataset.target === "tab-leads") {
+            refreshLeadsView();
+          }
+        }
       });
     });
+
+    async function refreshLeadsView() {
+      const container = overlay.querySelector("#mrj-leads-table-container");
+      if (!container) return;
+      container.innerHTML = `<p style="text-align:center; color:#94a3b8; padding:30px;">Buscando contatos...</p>`;
+
+      const leads = typeof getLeadsList === "function" ? await getLeadsList() : [];
+      if (!leads || leads.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:40px 20px; background:#20222a; border-radius:8px;">
+            <p style="color:#fff; font-weight:600; margin-bottom:6px;">Nenhum lead capturado ainda</p>
+            <p style="color:#94a3b8; font-size:12px; margin:0;">Quando os visitantes clicarem em 'Conheça o projeto' e preencherem o formulário para baixar o PDF, o contato completo aparecerá aqui automaticamente!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:#b49a70;">
+              <th style="padding:10px 8px;">Data/Hora</th>
+              <th style="padding:10px 8px;">Nome</th>
+              <th style="padding:10px 8px;">WhatsApp</th>
+              <th style="padding:10px 8px;">E-mail</th>
+              <th style="padding:10px 8px;">Imóvel</th>
+              <th style="padding:10px 8px; text-align:right;">Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${leads.map(l => {
+              const cleanPhone = (l.phone || "").replace(/\D/g, "");
+              const zapLink = cleanPhone ? `https://wa.me/55${cleanPhone.replace(/^55/, "")}?text=${encodeURIComponent(`Olá ${l.name}, vi que solicitou o book do ${l.project_name || 'imóvel'} no meu site.`)}` : "#";
+              const dateStr = l.created_at ? new Date(l.created_at).toLocaleString('pt-BR') : "-";
+              return `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                  <td style="padding:10px 8px; color:#94a3b8; font-size:11px;">${dateStr}</td>
+                  <td style="padding:10px 8px; font-weight:600; color:#fff;">${l.name}</td>
+                  <td style="padding:10px 8px; color:#e2e8f0;">${l.phone}</td>
+                  <td style="padding:10px 8px; color:#94a3b8;">${l.email || '-'}</td>
+                  <td style="padding:10px 8px; color:#d6b885;">${l.project_name || '-'}</td>
+                  <td style="padding:10px 8px; text-align:right;">
+                    ${cleanPhone ? `<a href="${zapLink}" target="_blank" rel="noreferrer" class="mrj-btn-small" style="background:#10b981; border:none; text-decoration:none; display:inline-block; font-size:11px;">Chamar no Zap ↗</a>` : ''}
+                  </td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    const refreshLeadsBtn = overlay.querySelector("#mrj-btn-refresh-leads");
+    if (refreshLeadsBtn) refreshLeadsBtn.addEventListener("click", refreshLeadsView);
+
+    const exportLeadsBtn = overlay.querySelector("#mrj-btn-export-leads");
+    if (exportLeadsBtn) {
+      exportLeadsBtn.addEventListener("click", async () => {
+        const leads = typeof getLeadsList === "function" ? await getLeadsList() : [];
+        if (!leads.length) {
+          alert("Não há leads para exportar no momento.");
+          return;
+        }
+        let csv = "Data,Nome,Telefone,Email,Imovel\n";
+        leads.forEach(l => {
+          csv += `"${l.created_at || ''}","${l.name || ''}","${l.phone || ''}","${l.email || ''}","${l.project_name || ''}"\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `leads-mrj-${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+      });
+    }
+
+    if (defaultTab === "tab-leads") {
+      refreshLeadsView();
+    }
 
     // Fechar modal
     overlay.querySelectorAll(".mrj-modal-close").forEach(btn => {

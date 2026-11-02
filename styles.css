@@ -325,3 +325,158 @@ button { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+/* ==========================================================================
+   MODAL DE CAPTURA DE LEADS (DOWNLOAD DO BOOK / PDF)
+   ========================================================================== */
+.mrj-lead-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(18, 20, 24, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: mrjFadeIn 0.25s ease;
+}
+
+.mrj-lead-modal {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  position: relative;
+  border: 1px solid rgba(180, 154, 112, 0.3);
+  font-family: var(--sans);
+}
+
+.mrj-lead-header {
+  background: #1c1d22;
+  color: #fff;
+  padding: 24px 24px 20px;
+  position: relative;
+}
+
+.mrj-lead-header h3 {
+  margin: 0 0 6px;
+  font: 700 18px var(--display);
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.mrj-lead-header p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #a4a5af;
+}
+
+.mrj-lead-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #9c9da3;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.mrj-lead-close:hover {
+  color: #fff;
+}
+
+.mrj-lead-body {
+  padding: 24px;
+}
+
+.mrj-lead-group {
+  margin-bottom: 14px;
+}
+
+.mrj-lead-group label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #76736f;
+  margin-bottom: 5px;
+}
+
+.mrj-lead-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  border: 1px solid #dcd7ce;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  background: #faf8f5;
+}
+
+.mrj-lead-input:focus {
+  outline: none;
+  border-color: var(--gold-dark);
+  background: #fff;
+}
+
+.mrj-lead-submit {
+  width: 100%;
+  min-height: 48px;
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.mrj-lead-submit:hover {
+  background: var(--gold-dark);
+  transform: translateY(-1px);
+}
+
+.mrj-lead-security {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 10px;
+  color: #928e88;
+}
+
+.mrj-lead-success {
+  text-align: center;
+  padding: 32px 20px;
+}
+
+.mrj-lead-success h4 {
+  font-size: 18px;
+  margin: 12px 0 6px;
+  color: #202126;
+}
+
+.mrj-lead-success p {
+  font-size: 12px;
+  color: #76736f;
+  margin: 0 0 20px;
+}
